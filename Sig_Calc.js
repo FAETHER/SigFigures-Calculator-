@@ -1,10 +1,10 @@
-// Author: MagicPower
+// Author: Kyryl(Etherr)
+// Project Started: 4/10/18  
 
 var Penis = prompt("Multiplication, Division, Addition, or Subtraction?");
 var Num1 = [];
 var Num2 = []; 
 var Sig_Total = 0;
-var Res_Total = 0;
 
 // instruction pointer or EIP in x86 assembly.
 var self = 
@@ -132,11 +132,11 @@ function I_like_This_Robust_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
     }
     
-    if (self.Num1.length==2&&self.Zero_Count==1)
-    {
-      Sig_Total = Sig_Total - 1;
-      console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
-    }
+   //  if (self.Num1.length==2&&self.Zero_Count==1)
+   // {
+   //   Sig_Total = Sig_Total - 1;
+   //   console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
+   // }
     
     if (self.Num1[i] >=self.Num1.length)
     {
@@ -236,11 +236,11 @@ function I_like_This_Sexy_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
     }
     
-    if (self.Num2.length==2&&self.Zero_Count==1)
-    {
-      Sig_Total = Sig_Total - 1;
-      console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
-    }
+  //  if (self.Num2.length==2&&self.Zero_Count==1)
+  //  {
+   //   Sig_Total = Sig_Total - 1;
+   //   console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
+   // }
     
     if (self.Num2[i] >=self.Num2.length)
     {
@@ -344,7 +344,6 @@ function Next_char()
 {
   console.log('ETHERR TRACER: <NEXT_CHAR_START. OLD length equ...>' + self.result_Len);
    
-  self.ebx = self.ecx; 
   self.ecx=self.ecx+1;
   self.New_Length = self.result_Len;
   console.log('ETHERR TRACER: <NEXT_CHAR. NEW length equ...>' + self.New_Length);
@@ -369,34 +368,109 @@ function Next_char()
     return self.i;
   }  
   
+function Round_Point()
+{
+  if (self.float ===true)
+  {
+  for (var i = self.result_Len-1; i>=0; i--)
+  {
+  //  console.log(self.result_S[i]);
+    self.count = self.count + 1;
+    
+    if (self.result_S[i] == '.')
+    {
+      self.count+1;
+      console.log("ETHERR TRACER: <Dot_Detected. Counter...>"+self.count);
+      break;
+    }
+  }
+  }
+  return; 
+}
+  
 function Round_Off()
 {
+  
+  //-1 because array numbering starts at 0 
+  self.Zero_Count = self.result_Len-self.Zero.length-1;
+  console.log(self.Zero_Count);
+  self.Dot_Detected = false;
+  
   for (var i=0; i<self.result_Len; i++) { 
-    if (self.result_S[i] >= 5)
+    if (self.result_S[i] >= 5&&self.Zero_Count == i&&self.float !==true)
     {
       self.eax = self.result_S[i];
-      self.eax++;
-      if(self.eax == 10)
-      {
-        self.eax=0;
-      }
-      self.result_R = self.eax;//+[self.result_S[i+1]];
+      
+      if (self.result_S[i+1] >= 5){self.eax++;}
+      
+      if(self.eax == 10){self.eax =0;}
+      
+      if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
+      
+      self.result_R = self.eax;
+      
       console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
-    }
+    }else{self.result_R = self.result_S[i];}
+    
     if (self.result_S[i] < 5)
     {
       self.result_R = self.result_S[i];
       console.log('ETHERR TRACER: <ROUND_DOWN. NULL...>' + self.result_R);
     }
-    if (self.ecx == i)
+    
+    if (self.result_S[i] >= 5&&self.float ===true)
     {
-      break;
+      self.Zero_Count = self.result_Len-self.Zero.length-self.count-1;
+      console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT> = ' + self.Zero_Count);
+      if (self.Zero_Count == i)
+      {
+        self.eax = self.result_S[i];
+        
+        if (self.result_S[i+1] >= 5){self.eax++;}
+        
+        if (self.result_S[i+1] == '.')
+        {
+          if (self.result_S[i+2] >= 5){self.eax++;}
+        }
+        
+        if(self.eax == 10){self.eax =0;}
+        
+        if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
+        
+        self.result_R = self.eax;
+        
+        console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded...>' + self.result_R);
+      }else{self.result_R = self.result_S[i];}
+      
     }
+    
+    if (self.ecx == i){break;}
+    
   }
   console.log('ETHERR TRACER: <ROUND_RETURN. ...>' + self.result_R);
   console.log('-------------------------');
   self.ecx++;
   return self.result_R;
+}
+
+function Round_After_Dot(Sig_Total)
+{
+  for (var i=0; i<self.result_Len; i++) 
+  {
+    if(self.result_S[0]=='0'&&self.result_S[1]=='.')
+    {
+      //This part is hardcoded for 0. possibility as an answer. 
+      //fucking string; i am too lazy to convert it to int so do it by increment 2 times.
+      //have to increase length too, since got more sigs...
+      Sig_Total++;
+      Sig_Total++;
+      self.result_Len = self.result_S.length + 2;
+      console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Return sig +2...>'+Sig_Total);
+      console.log('---------------------------------------------------');
+      return Sig_Total;
+    }else{return Sig_Total;}
+  }
+  
 }
 
 function Float_Point()
@@ -412,7 +486,28 @@ function Float_Point()
       return;
     }
   }
-    for (var ebx=0; i<Sig_Total-1; ebx++)
+    Round_Point();
+    self.vF = self.result_S.length - Sig_Total-self.count;
+    
+    for (self.index = 0; self.index<self.vF; self.index++)
+    {
+      self.Zero = self.Zero+['0'];
+      console.log(self.Zero);
+      console.log('-------------------------');
+    }
+    
+    for (var edx = 0; edx<self.result_Len; edx++ )
+    {
+      self.Round = self.Round + Round_Off();
+      console.log("ROUND STATE:"+self.Round);
+      console.log('-------------------------');
+    }
+    self.result_S = self.Round;
+    //reset program counter
+    self.ecx = 0;
+  
+    Sig_Total = Round_After_Dot(Sig_Total);
+    for (var ebx=0; ebx<Sig_Total-1; ebx++)
     {
       self.result_Sig =self.result_Sig+Next_char();
       console.log(self.result_Sig);
@@ -422,26 +517,32 @@ function Float_Point()
   return self.result_S;    
 }
 
-function mult(Sig_Total)
+function INIT_VAR()
 {
-
-  if (Sig_Total >= 1)
-  {
     self.ecx = 0;
+    self.count = 0;
     Sig_Total = Sig_Total.toString();
     self.result_S = multiply.toString();
     self.result_Len = self.result_S.length;
     self.v = self.result_S.length - Sig_Total; 
-    self.m = self.Num2.length - Sig_Total;
     self.N_Zeros = self.result_S.length - 1;
     self.index = 0;
     self.n = 0;
     self.Zero = [];
     self.Round = [];
     self.result_Sig = [];
+  return;  
+}
+
+function mult(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
     
+    INIT_VAR();
     
-    self.result_F = Float_Point();
+    self.result_F = Float_Point(Sig_Total);
     if (self.float === true)
     {
       return self.result_F;
@@ -453,14 +554,13 @@ function mult(Sig_Total)
       return self.result_S;
     }
       
-    for (self.index = self.index; self.index<self.v; self.index++)
+    for (self.index = 0; self.index<self.v; self.index++)
     {
     // My hand crafted substitute for .push API!
       self.Zero = self.Zero+['0'];
-      console.log(self.Zero.length);
+      console.log(self.Zero);
       console.log('-------------------------');
     }
-    
     for (var ebx = 0; ebx<self.result_Len; ebx++ )
     {
       self.Round = self.Round + Round_Off();
@@ -478,7 +578,7 @@ function mult(Sig_Total)
       console.log("NEXT_CHAR STATE:"+self.result_Sig);
     }
     
-    self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
+   self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
     
     return self.result_S;
   }else{return false;}
@@ -489,15 +589,8 @@ function div(Sig_Total)
 
   if (Sig_Total >= 1)
   {
-    self.ecx = 0;
-    Sig_Total = Sig_Total.toString();
-    self.result_S = divide.toString();
-    self.result_Len = self.result_S.length;
-    self.v = self.result_S.length - Sig_Total; 
-    self.m = self.Num2.length - Sig_Total;
-    self.N_Zeros = self.result_S.length - 1;
-    self.Zero = [];
-    self.index = 0;
+    
+    INIT_VAR();
     
     self.Num1 = self.result_S;
     if (Sig_Total == I_like_This_Robust_Parser(0))
@@ -525,15 +618,8 @@ function add(Sig_Total)
 
   if (Sig_Total >= 1)
   {
-    self.ecx = 0;
-    Sig_Total = Sig_Total.toString();
-    self.result_S = addition.toString();
-    self.result_Len = self.result_S.length;
-    self.v = self.result_S.length - Sig_Total; 
-    self.m = self.Num2.length - Sig_Total;
-    self.N_Zeros = self.result_S.length - 1;
-    self.Zero = [];
-    self.index = 0;
+    
+    INIT_VAR();
     
     self.Num1 = self.result_S;
     if (Sig_Total == I_like_This_Robust_Parser(0))
@@ -561,15 +647,8 @@ function sub(Sig_Total)
 
   if (Sig_Total >= 1)
   {
-    self.ecx = 0;
-    Sig_Total = Sig_Total.toString();
-    self.result_S = subtraction.toString();
-    self.result_Len = self.result_S.length;
-    self.v = self.result_S.length - Sig_Total; 
-    self.m = self.Num2.length - Sig_Total;
-    self.N_Zeros = self.result_S.length - 1;
-    self.Zero = [];
-    self.index = 0;
+    
+    INIT_VAR();
     
     self.Num1 = self.result_S;
     if (Sig_Total == I_like_This_Robust_Parser(0))
@@ -603,7 +682,7 @@ if (Penis=="m" && self.OnLoopFinish === true) {
   console.log ('RESULT:');
   console.log(multiply);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
-  console.log(self.result);
+  console.log(self.result+"   --->Rounded answer");
   
 }
 
@@ -617,7 +696,7 @@ if (Penis=="d" && self.OnLoopFinish === true) {
   console.log ('RESULT:');
   console.log(divide);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
-  console.log(self.result);
+  console.log(self.result+"   --->Rounded answer");
   
 }
 
@@ -631,7 +710,7 @@ if (Penis=="a" && self.OnLoopFinish === true) {
   console.log ('RESULT:');
   console.log(addition);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
-  console.log(self.result);
+  console.log(self.result+"   --->Rounded answer");
   
 }
 
@@ -645,7 +724,7 @@ if (Penis=="s" && self.OnLoopFinish === true) {
   console.log ('RESULT:');
   console.log(subtraction);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
-  console.log(self.result);
+  console.log(self.result+"   --->Rounded answer");
   
 }
 
