@@ -6,6 +6,7 @@ var Num2 = [];
 var Sig_Total = 0;
 var Res_Total = 0;
 
+// instruction pointer or EIP in x86 assembly.
 var self = 
 {
   first: Num1,
@@ -367,10 +368,58 @@ function Next_char()
     console.log('ETHERR TRACER: <NEXT_CHAR_END. NEW length equ...>' + self.New_Length);
     return self.i;
   }  
+  
+function Round_Off()
+{
+  for (var i=0; i<self.result_Len; i++) { 
+    if (self.result_S[i] >= 5)
+    {
+      self.eax = self.result_S[i];
+      self.eax++;
+      if(self.eax == 10)
+      {
+        self.eax=0;
+      }
+      self.result_R = self.eax;//+[self.result_S[i+1]];
+      console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
+    }
+    if (self.result_S[i] < 5)
+    {
+      self.result_R = self.result_S[i];
+      console.log('ETHERR TRACER: <ROUND_DOWN. NULL...>' + self.result_R);
+    }
+    if (self.ecx == i)
+    {
+      break;
+    }
+  }
+  console.log('ETHERR TRACER: <ROUND_RETURN. ...>' + self.result_R);
+  console.log('-------------------------');
+  self.ecx++;
+  return self.result_R;
+}
 
 function Float_Point()
 {
-  
+  for (var i=0; i<self.result_Len; i++) { 
+    if (self.result_S[i]== '.')
+    {
+      self.float = true;
+      console.log('Float == true');
+      break;
+    }else if (self.float !==true&&i+1==self.result_Len){
+      console.log('Float == false');
+      return;
+    }
+  }
+    for (var ebx=0; i<Sig_Total-1; ebx++)
+    {
+      self.result_Sig =self.result_Sig+Next_char();
+      console.log(self.result_Sig);
+    }
+    
+    self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
+  return self.result_S;    
 }
 
 function mult(Sig_Total)
@@ -385,11 +434,18 @@ function mult(Sig_Total)
     self.v = self.result_S.length - Sig_Total; 
     self.m = self.Num2.length - Sig_Total;
     self.N_Zeros = self.result_S.length - 1;
-    self.Zero = [];
     self.index = 0;
     self.n = 0;
+    self.Zero = [];
+    self.Round = [];
+    self.result_Sig = [];
     
-    Float_Point();
+    
+    self.result_F = Float_Point();
+    if (self.float === true)
+    {
+      return self.result_F;
+    }
     
     self.Num1 = self.result_S;
     if (Sig_Total == I_like_This_Robust_Parser(0))
@@ -399,51 +455,30 @@ function mult(Sig_Total)
       
     for (self.index = self.index; self.index<self.v; self.index++)
     {
-      self.Zero.push('0');
-      self.Zero.join("");
-      console.log(self.Zero.join(""));
+    // My hand crafted substitute for .push API!
+      self.Zero = self.Zero+['0'];
       console.log(self.Zero.length);
       console.log('-------------------------');
     }
-      
-//      for (var ebx =0; ebx<Sig_Total; ebx++)
-//      {
-//        self.result_S[self.n] = self.result_S.push([Next_char()])
-//      }
-      
-      switch (Sig_Total)
-      {
-        case 1:
-          self.result_S = self.result_S[self.n]+[self.Zero];
-        break;
-        case 2:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[self.Zero];
-        break;  
-        case 3:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 4:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 5:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 6:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 7:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 8:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 9:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-        case 10:
-          self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
-        break;  
-      }
+    
+    for (var ebx = 0; ebx<self.result_Len; ebx++ )
+    {
+      self.Round = self.Round + Round_Off();
+      console.log("ROUND STATE:"+self.Round);
+      console.log('-------------------------');
+    }
+    self.result_S = self.Round;
+    //reset program counter
+    self.ecx = 0;
+    
+    //This one is extremely important and cool piece of code!
+    for (var i=0; i<Sig_Total-1; i++)
+    {
+      self.result_Sig =self.result_Sig+Next_char();
+      console.log("NEXT_CHAR STATE:"+self.result_Sig);
+    }
+    
+    self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
     
     return self.result_S;
   }else{return false;}
