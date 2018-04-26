@@ -349,7 +349,7 @@ function Next_char()
   console.log('ETHERR TRACER: <NEXT_CHAR. NEW length equ...>' + self.New_Length);
   console.log('ETHERR TRACER: <NEXT_CHAR. ecx equ...>' + self.ecx);
   
-  for (var i=1; i<self.New_Length; i++) { 
+  for (var i=self.transfer; i<self.New_Length; i++) { 
 
     self.New_Length = self.result_Len-self.ecx;  
     
@@ -357,8 +357,9 @@ function Next_char()
     console.log('ETHERR TRACER: <NEXT_CHAR. return value...>' + self.i);
     console.log('ETHERR TRACER: <NEXT_CHAR. index value...>' + i);
     
-    // if i corresponds to the result value for that index - break
+    // if i corresponds to the result value for that index --> break
     //The most beautiful code ever!!!
+    self.transfer = i;
     if (i==self.ecx)
     {
       break;
@@ -368,19 +369,38 @@ function Next_char()
     return self.i;
   }  
   
-function Round_Point()
+function Round_Point_After()
 {
   if (self.float ===true)
   {
   for (var i = self.result_Len-1; i>=0; i--)
   {
   //  console.log(self.result_S[i]);
-    self.count = self.count + 1;
+    self.count_A = self.count_A + 1;
     
     if (self.result_S[i] == '.')
     {
-      self.count+1;
-      console.log("ETHERR TRACER: <Dot_Detected. Counter...>"+self.count);
+      self.count_A+1;
+      console.log("ETHERR TRACER: <Dot_Detected_After. Counter...>"+self.count_A);
+      break;
+    }
+  }
+  }
+  return; 
+}
+
+function Round_Point_Before()
+{
+  if (self.float ===true)
+  {
+  for (var i=0; i<self.result_Len; i++)
+  {
+  //  console.log(self.result_S[i]);
+    self.count_B = self.count_B + 1;
+    
+    if (self.result_S[i] == '.')
+    {
+      console.log("ETHERR TRACER: <Dot_Detected_Before. Counter...>"+self.count_B);
       break;
     }
   }
@@ -393,10 +413,9 @@ function Round_Off()
   
   //-1 because array numbering starts at 0 
   self.Zero_Count = self.result_Len-self.Zero.length-1;
-  console.log(self.Zero_Count);
-  self.Dot_Detected = false;
+  // console.log(self.Zero_Count);
   
-  for (var i=0; i<self.result_Len; i++) { 
+  for (var i=self.transfer; i<self.result_Len; i++) { 
     if (self.result_S[i] >= 5&&self.Zero_Count == i&&self.float !==true)
     {
       self.eax = self.result_S[i];
@@ -417,11 +436,36 @@ function Round_Off()
       self.result_R = self.result_S[i];
       console.log('ETHERR TRACER: <ROUND_DOWN. NULL...>' + self.result_R);
     }
-    
-    if (self.result_S[i] >= 5&&self.float ===true)
+      
+    if (self.result_S[i+1] >= 5&&self.float ===true)
     {
-      self.Zero_Count = self.result_Len-self.Zero.length-self.count-1;
-      console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT> = ' + self.Zero_Count);
+      self.Zero_Count = self.result_Len-self.Zero.length-self.count_A-1;
+      console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT _A> = ' + self.Zero_Count);
+      console.log('ETHERR TRACER: <Float_INDEX> = ' + i);
+      if (self.Zero_Count <= i)
+      {
+        self.eax = self.result_S[i];
+        
+        if (self.result_S[i+1] >= 5){self.eax++;}
+        
+        if (self.result_S[i+1] == '.')
+        {
+          if (self.result_S[i+2] >= 5){self.eax++;}
+        }
+        
+        if(self.eax == 10){self.eax =0;}
+        
+        if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
+        
+        self.result_R = self.eax;
+        
+        console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded _A>' + self.result_R);
+        self.transfer = i;
+        break;
+      }else{self.result_R = self.result_S[i];}
+      
+      self.Zero_Count = self.count_B;
+      console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT _B> = ' + self.Zero_Count);
       if (self.Zero_Count == i)
       {
         self.eax = self.result_S[i];
@@ -439,12 +483,23 @@ function Round_Off()
         
         self.result_R = self.eax;
         
-        console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded...>' + self.result_R);
-      }else{self.result_R = self.result_S[i];}
-      
+        console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded _B>' + self.result_R);
+      }else{self.result_R = self.result_S[i];}      
     }
     
-    if (self.ecx == i){break;}
+    // 0. answer round
+    if (self.R_Dot&&self.float)
+    {
+      if(self.result_S[Sig_Total]>=5&& i == Sig_Total-1)
+      {
+        self.eax = self.result_S[Sig_Total-1];
+        self.eax++;
+        if(self.eax == 10){self.eax =0;}
+        self.result_R = self.eax;
+      }else{self.result_R = self.result_S[i];}
+    }    
+    
+    if (self.ecx == i){self.transfer = i; break;}
     
   }
   console.log('ETHERR TRACER: <ROUND_RETURN. ...>' + self.result_R);
@@ -453,11 +508,11 @@ function Round_Off()
   return self.result_R;
 }
 
-function Round_After_Dot(Sig_Total)
+function Sig_After_Dot(Sig_Total)
 {
   for (var i=0; i<self.result_Len; i++) 
   {
-    if(self.result_S[0]=='0'&&self.result_S[1]=='.')
+    if(self.result_S[0]=='0'&&self.result_S[1]=='.') 
     {
       //This part is hardcoded for 0. possibility as an answer. 
       //fucking string; i am too lazy to convert it to int so do it by increment 2 times.
@@ -465,12 +520,12 @@ function Round_After_Dot(Sig_Total)
       Sig_Total++;
       Sig_Total++;
       self.result_Len = self.result_S.length + 2;
+      self.R_Dot = true;
       console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Return sig +2...>'+Sig_Total);
       console.log('---------------------------------------------------');
       return Sig_Total;
     }else{return Sig_Total;}
   }
-  
 }
 
 function Float_Point()
@@ -486,8 +541,13 @@ function Float_Point()
       return;
     }
   }
-    Round_Point();
-    self.vF = self.result_S.length - Sig_Total-self.count;
+    Round_Point_After();
+    Round_Point_Before();
+    Sig_Total = Sig_After_Dot(Sig_Total);
+    
+    self.vF = self.result_S.length - Sig_Total-self.count_A;
+    
+    if (self.R_Dot){self.vF = 0;}
     
     for (self.index = 0; self.index<self.vF; self.index++)
     {
@@ -503,24 +563,32 @@ function Float_Point()
       console.log('-------------------------');
     }
     self.result_S = self.Round;
-    //reset program counter
+
     self.ecx = 0;
-  
-    Sig_Total = Round_After_Dot(Sig_Total);
+    
+    //example of birwise xor in JS. Just for fun.
+    self.transfer = self.transfer ^ self.transfer;
+    
+    if (self.R_Dot){Sig_Total--;}
+    
     for (var ebx=0; ebx<Sig_Total-1; ebx++)
     {
       self.result_Sig =self.result_Sig+Next_char();
       console.log(self.result_Sig);
+      if (self.result_Sig[ebx] == '.')
+      {Sig_Total++;}
     }
     
-    self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
+    self.result_S = self.result_S[self.n]+[self.result_Sig]+[',']+[self.Zero];
   return self.result_S;    
 }
 
 function INIT_VAR()
 {
     self.ecx = 0;
-    self.count = 0;
+    self.count_A = 0;
+    self.count_B = 0;
+    self.transfer = 0;
     Sig_Total = Sig_Total.toString();
     self.result_S = multiply.toString();
     self.result_Len = self.result_S.length;
@@ -530,6 +598,7 @@ function INIT_VAR()
     self.n = 0;
     self.Zero = [];
     self.Round = [];
+    self.R_Dot = false;
     self.result_Sig = [];
   return;  
 }
@@ -541,6 +610,57 @@ function mult(Sig_Total)
   {
     
     INIT_VAR();
+  //  Round_After_Dot();
+    self.result_F = Float_Point(Sig_Total);
+    if (self.float === true)
+    {
+      return self.result_F;
+    }
+    
+    self.Num1 = self.result_S;
+    if (Sig_Total == I_like_This_Robust_Parser(0))
+    {
+      return self.result_S;
+    }
+      
+    for (self.index = 0; self.index<self.v; self.index++)
+    {
+    // My hand crafted substitute for .push API!
+      self.Zero = self.Zero+['0'];
+      console.log(self.Zero);
+      console.log('-------------------------');
+    }
+    for (var ebx = 0; ebx<self.result_Len; ebx++ )
+    {
+      self.Round = self.Round + Round_Off();
+      console.log("ROUND STATE:"+self.Round);
+      console.log('-------------------------');
+    }
+    self.result_S = self.Round;
+    //reset program counter
+    self.ecx = 0;
+    self.transfer = 1;
+    //This one is extremely important and cool piece of code!
+    for (var i=0; i<Sig_Total-1; i++)
+    {
+      self.result_Sig =self.result_Sig+Next_char();
+      console.log("NEXT_CHAR STATE:"+self.result_Sig);
+    }
+    
+   self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
+    
+    return self.result_S;
+  }else{return false;}
+  }
+  
+function div(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
+    
+    INIT_VAR();
+    self.result_S = divide.toString();
     
     self.result_F = Float_Point(Sig_Total);
     if (self.float === true)
@@ -578,40 +698,11 @@ function mult(Sig_Total)
       console.log("NEXT_CHAR STATE:"+self.result_Sig);
     }
     
-   self.result_S = self.result_S[self.n]+[self.result_Sig]+[self.Zero];
+   self.result_S = self.result_S[self.n]+[self.result_Sig]/*+[',']*/+[self.Zero];
     
     return self.result_S;
   }else{return false;}
-  }
-  
-function div(Sig_Total)
-{
-
-  if (Sig_Total >= 1)
-  {
-    
-    INIT_VAR();
-    
-    self.Num1 = self.result_S;
-    if (Sig_Total == I_like_This_Robust_Parser(0))
-    {
-      return self.result_S;
-    }
-      
-    for (self.index = self.index; self.index<self.v; self.index++)
-    {
-      self.Zero.push('0');
-      self.Zero.join("");
-      console.log(self.Zero.join(""));
-      console.log(self.Zero.length);
-      console.log('-------------------------');
-    }
-      
-
-    
-    return self.result_S;
-  }else{return false;}
-  }  
+  } 
 
 function add(Sig_Total)
 {
@@ -679,6 +770,7 @@ if (Penis=="m" && self.OnLoopFinish === true) {
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = mult(Sig_Total);
   console.log ('<------------------------------------------------->');
+  console.log("Operands:"+self.Num1 + "*" + self.Num2);
   console.log ('RESULT:');
   console.log(multiply);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -686,13 +778,13 @@ if (Penis=="m" && self.OnLoopFinish === true) {
   
 }
 
-if (Penis=="d" && self.OnLoopFinish === true) {
-  Sig_Total = Get_Smallest();
+else if (Penis=="d" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = div(Sig_Total);
   console.log ('<------------------------------------------------->');
+  console.log("Operands:"+self.Num1 + "/" + self.Num2);
   console.log ('RESULT:');
   console.log(divide);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -700,13 +792,14 @@ if (Penis=="d" && self.OnLoopFinish === true) {
   
 }
 
-if (Penis=="a" && self.OnLoopFinish === true) {
+else if (Penis=="a" && self.OnLoopFinish === true) {
   Sig_Total = Get_Largest();
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = add(Sig_Total);
   console.log ('<------------------------------------------------->');
+  console.log("Operands:"+self.Num1 + "+" + self.Num2);
   console.log ('RESULT:');
   console.log(addition);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -714,13 +807,14 @@ if (Penis=="a" && self.OnLoopFinish === true) {
   
 }
 
-if (Penis=="s" && self.OnLoopFinish === true) {
+else if (Penis=="s" && self.OnLoopFinish === true) {
   Sig_Total = Get_Largest();
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = sub(Sig_Total);
   console.log ('<------------------------------------------------->');
+  console.log("Operands:"+self.Num1 + "-" + self.Num2);
   console.log ('RESULT:');
   console.log(subtraction);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
