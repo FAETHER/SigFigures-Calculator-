@@ -21,22 +21,13 @@ var subtraction = self.Num1-self.Num2 ;
 self.Num1 = self.Num1.toString();
 self.Num2 = self.Num2.toString();
 
-function After_Dot()
-{
-  
-}
-
-function Skip(Sig_Total)
-{
-  
-}
-
 function Number_Type(i)
 {
   var Natural_Number = false;
   for(var num = 1; num>0; num++)
   {
-//  console.log(self.Num1[i]);
+  if (self.Parser_ID == 1)
+  {
     if (self.Num1[i]>=num)
     {
       Natural_Number = true;
@@ -45,6 +36,16 @@ function Number_Type(i)
       Natural_Number = false;
       return Natural_Number;
     }
+  }else{
+    if (self.Num2[i]>=num)
+    {
+      Natural_Number = true;
+      return Natural_Number;
+    }else if (self.Num2[i] != num){
+      Natural_Number = false;
+      return Natural_Number;
+    }
+  }
   }
 }
 
@@ -52,6 +53,8 @@ function I_like_This_Robust_Parser(Sig_Total)
 {
   self.Zero_Count = 0;
   self.LONG_TRAIL = false;
+  self.Dot_Detected = false;
+  self.Parser_ID = 1;
   for (var i=0; i<self.Num1.length; i++) {
     console.log('----------------------------------------');
     console.log('Elements:');
@@ -65,6 +68,11 @@ function I_like_This_Robust_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
       console.log('i see dot tok to t eeee! Removing sigFigure... ' + Sig_Total);
       self.Dot_Detected = true;
+      if (Number_Type(i-1) === true)
+      {
+        console.log('ETHERR TRACER: <Real_Number_Before_Dot. Setting carry flag...>' + Sig_Total);
+        self.carry = true;
+      }
     } 
     
     if (self.Num1[0] == '0'&&self.Dot_Detected !==true){
@@ -110,6 +118,17 @@ function I_like_This_Robust_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
       self.LONG_TRAIL = true;
       console.log('ETHERR TRACER: <Saw_Trail_Zero_Long. Removing sig figure...>' + Sig_Total);
+      if (Number_Type(i+1) === true)
+      {
+        console.log("ETHERR TRACER: <Saw_Natural_Number_End. Restoring zero's sigs...>" + Sig_Total);
+        Sig_Total = Sig_Total+self.Zero_Count;
+      }
+    }
+    
+    if (i==self.Num1.length-1&&Number_Type(i) === false&&self.Dot_Detected !==true&&self.Zero_Count < 2)
+    {
+      console.log("ETHERR TRACER: <Saw_End_Zero. Removing sig figure...>" + Sig_Total);
+      Sig_Total = Sig_Total - 1;
     }
     
     if (self.Num1.length==2&&self.Zero_Count==1)
@@ -129,7 +148,6 @@ function I_like_This_Robust_Parser(Sig_Total)
   self.No_trail = false;
   self.Zero_Count = 0;
   self.LONG_TRAIL = false;
-  self.Dot_Detected = false;
   self.carry = false;
   self.OnLoopFinish = true;
   return Sig_Total;
@@ -139,6 +157,8 @@ function I_like_This_Sexy_Parser(Sig_Total)
 {
   self.Zero_Count = 0;
   self.LONG_TRAIL = false;
+  self.Dot_Detected = false;
+  self.Parser_ID = 2;
   for (var i=0; i<self.Num2.length; i++) {
     console.log('----------------------------------------');
     console.log('Elements:');
@@ -152,6 +172,11 @@ function I_like_This_Sexy_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
       console.log('i see dot tok to t eeee! Removing sigFigure... ' + Sig_Total);
       self.Dot_Detected = true;
+      if (Number_Type(i-1) === true)
+      {
+        console.log('ETHERR TRACER: <Real_Number_Before_Dot. Setting carry flag...>' + Sig_Total);
+        self.carry = true;
+      }
     } 
     
     if (self.Num2[0] == '0'&&self.Dot_Detected !==true){
@@ -197,6 +222,17 @@ function I_like_This_Sexy_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
       self.LONG_TRAIL = true;
       console.log('ETHERR TRACER: <Saw_Trail_Zero_Long. Removing sig figure...>' + Sig_Total);
+      if (Number_Type(i+1) === true)
+      {
+        console.log("ETHERR TRACER: <Saw_Natural_Number_End. Restoring zero's sigs...>" + Sig_Total);
+        Sig_Total = Sig_Total+self.Zero_Count;
+      }
+    }
+    
+    if (i==self.Num2.length-1&&Number_Type(i) === false&&self.Dot_Detected !==true&&self.Zero_Count < 2)
+    {
+      console.log("ETHERR TRACER: <Saw_End_Zero. Removing sig figure...>" + Sig_Total);
+      Sig_Total = Sig_Total - 1;
     }
     
     if (self.Num2.length==2&&self.Zero_Count==1)
@@ -216,7 +252,6 @@ function I_like_This_Sexy_Parser(Sig_Total)
   self.No_trail = false;
   self.Zero_Count = 0;
   self.LONG_TRAIL = false;
-  self.Dot_Detected = false;
   self.carry = false;
   self.OnLoopFinish = true;
   return Sig_Total;
@@ -232,6 +267,25 @@ function Get_Smallest()
     self.n = self.Num2.length - self.Num2_S;
     return self.Num2_S;
   }else if (self.Num1_S < self.Num2_S){
+    self.n = self.Num1.length - self.Num1_S;
+    return self.Num1_S;
+  }else if (self.Num1_S == self.Num2_S){
+    return self.Num2_S;
+  }else{
+    return false;
+  }
+}
+
+function Get_Largest()
+{
+  self.Num1_S = I_like_This_Robust_Parser(0);
+  self.Num2_S = I_like_This_Sexy_Parser(0);
+  
+  if (self.Num1_S < self.Num2_S)
+  {
+    self.n = self.Num2.length - self.Num2_S;
+    return self.Num2_S;
+  }else if (self.Num1_S > self.Num2_S){
     self.n = self.Num1.length - self.Num1_S;
     return self.Num1_S;
   }else if (self.Num1_S == self.Num2_S){
@@ -314,21 +368,28 @@ function Next_char()
     return self.i;
   }  
 
-
-function Silly_Sig_Calc(Sig_Total)
+function Float_Point()
 {
+  
+}
+
+function mult(Sig_Total)
+{
+
   if (Sig_Total >= 1)
   {
     self.ecx = 0;
     Sig_Total = Sig_Total.toString();
     self.result_S = multiply.toString();
     self.result_Len = self.result_S.length;
-    self.v = self.result_S.length - Sig_Total; //3
-  //  self.n = self.Num1.length - Sig_Total;
+    self.v = self.result_S.length - Sig_Total; 
     self.m = self.Num2.length - Sig_Total;
     self.N_Zeros = self.result_S.length - 1;
     self.Zero = [];
     self.index = 0;
+    self.n = 0;
+    
+    Float_Point();
     
     self.Num1 = self.result_S;
     if (Sig_Total == I_like_This_Robust_Parser(0))
@@ -386,15 +447,123 @@ function Silly_Sig_Calc(Sig_Total)
     
     return self.result_S;
   }else{return false;}
-}
+  }
+  
+function div(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
+    self.ecx = 0;
+    Sig_Total = Sig_Total.toString();
+    self.result_S = divide.toString();
+    self.result_Len = self.result_S.length;
+    self.v = self.result_S.length - Sig_Total; 
+    self.m = self.Num2.length - Sig_Total;
+    self.N_Zeros = self.result_S.length - 1;
+    self.Zero = [];
+    self.index = 0;
+    
+    self.Num1 = self.result_S;
+    if (Sig_Total == I_like_This_Robust_Parser(0))
+    {
+      return self.result_S;
+    }
+      
+    for (self.index = self.index; self.index<self.v; self.index++)
+    {
+      self.Zero.push('0');
+      self.Zero.join("");
+      console.log(self.Zero.join(""));
+      console.log(self.Zero.length);
+      console.log('-------------------------');
+    }
+      
+
+    
+    return self.result_S;
+  }else{return false;}
+  }  
+
+function add(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
+    self.ecx = 0;
+    Sig_Total = Sig_Total.toString();
+    self.result_S = addition.toString();
+    self.result_Len = self.result_S.length;
+    self.v = self.result_S.length - Sig_Total; 
+    self.m = self.Num2.length - Sig_Total;
+    self.N_Zeros = self.result_S.length - 1;
+    self.Zero = [];
+    self.index = 0;
+    
+    self.Num1 = self.result_S;
+    if (Sig_Total == I_like_This_Robust_Parser(0))
+    {
+      return self.result_S;
+    }
+      
+    for (self.index = self.index; self.index<self.v; self.index++)
+    {
+      self.Zero.push('0');
+      self.Zero.join("");
+      console.log(self.Zero.join(""));
+      console.log(self.Zero.length);
+      console.log('-------------------------');
+    }
+      
+
+    
+    return self.result_S;
+  }else{return false;}
+  }
+  
+function sub(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
+    self.ecx = 0;
+    Sig_Total = Sig_Total.toString();
+    self.result_S = subtraction.toString();
+    self.result_Len = self.result_S.length;
+    self.v = self.result_S.length - Sig_Total; 
+    self.m = self.Num2.length - Sig_Total;
+    self.N_Zeros = self.result_S.length - 1;
+    self.Zero = [];
+    self.index = 0;
+    
+    self.Num1 = self.result_S;
+    if (Sig_Total == I_like_This_Robust_Parser(0))
+    {
+      return self.result_S;
+    }
+      
+    for (self.index = self.index; self.index<self.v; self.index++)
+    {
+      self.Zero.push('0');
+      self.Zero.join("");
+      console.log(self.Zero.join(""));
+      console.log(self.Zero.length);
+      console.log('-------------------------');
+    }
+      
+
+    
+    return self.result_S;
+  }else{return false;}
+  }  
 
 Sig_Total = Get_Smallest();
-console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
-Silly_Sig_Switch(Sig_Total);
-console.log("----------->SILLY MATH CALC START<---------------");
-self.result = Silly_Sig_Calc(Sig_Total);
 
 if (Penis=="m" && self.OnLoopFinish === true) {
+  console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
+  Silly_Sig_Switch(Sig_Total);
+  console.log("----------->SILLY MATH CALC START<---------------");
+  self.result = mult(Sig_Total);
   console.log ('<------------------------------------------------->');
   console.log ('RESULT:');
   console.log(multiply);
@@ -403,6 +572,47 @@ if (Penis=="m" && self.OnLoopFinish === true) {
   
 }
 
+if (Penis=="d" && self.OnLoopFinish === true) {
+  Sig_Total = Get_Smallest();
+  console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
+  Silly_Sig_Switch(Sig_Total);
+  console.log("----------->SILLY MATH CALC START<---------------");
+  self.result = div(Sig_Total);
+  console.log ('<------------------------------------------------->');
+  console.log ('RESULT:');
+  console.log(divide);
+  console.log ('SIGFIGURES OR FAKE MATH RESULT:');
+  console.log(self.result);
+  
+}
+
+if (Penis=="a" && self.OnLoopFinish === true) {
+  Sig_Total = Get_Largest();
+  console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
+  Silly_Sig_Switch(Sig_Total);
+  console.log("----------->SILLY MATH CALC START<---------------");
+  self.result = add(Sig_Total);
+  console.log ('<------------------------------------------------->');
+  console.log ('RESULT:');
+  console.log(addition);
+  console.log ('SIGFIGURES OR FAKE MATH RESULT:');
+  console.log(self.result);
+  
+}
+
+if (Penis=="s" && self.OnLoopFinish === true) {
+  Sig_Total = Get_Largest();
+  console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
+  Silly_Sig_Switch(Sig_Total);
+  console.log("----------->SILLY MATH CALC START<---------------");
+  self.result = sub(Sig_Total);
+  console.log ('<------------------------------------------------->');
+  console.log ('RESULT:');
+  console.log(subtraction);
+  console.log ('SIGFIGURES OR FAKE MATH RESULT:');
+  console.log(self.result);
+  
+}
 
 
 
