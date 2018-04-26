@@ -2,7 +2,7 @@
 // Project Started: 4/10/18  
 // viable project mult/div (4/23/18)
 
-var Penis = prompt("Multiplication, Division, Addition, or Subtraction?");
+var Operation = prompt("Multiplication, Division, Addition, or Subtraction?");
 var Num1 = [];
 var Num2 = []; 
 var Sig_Total = 0;
@@ -14,12 +14,13 @@ var self =
   second: Num2
 };
 
-self.Num1 = promptNum("First Number?");
-self.Num2 = promptNum("Second Number?");
-var multiply = self.Num1*self.Num2 ;
-var divide = self.Num1/self.Num2 ;
-var addition = self.Num1+self.Num2 ;
-var subtraction = self.Num1-self.Num2 ;
+self.Num1 = prompt("First Number?");
+self.Num2 = prompt("Second Number?");
+var multiply = Number(self.Num1)*Number(self.Num2) ;
+var divide = Number(self.Num1)/Number(self.Num2) ;
+var addition = Number(self.Num1)+Number(self.Num2) ;
+var subtraction = Number(self.Num1)-Number(self.Num2) ;
+//if(self.Num1||self.Num2===null){throw new Error(['Ooops, no input. How did that happen? :trollfaceXD'])}
 self.Num1 = self.Num1.toString();
 self.Num2 = self.Num2.toString();
 self.Num1_Old = self.Num1;
@@ -269,7 +270,7 @@ self.Num2_S = I_like_This_Sexy_Parser(0);
 function Get_Smallest(Num1,Num2)
 {
   if(Num1===Num1.toString()||Num2===Num2.toString())
-  {new Error(['Ooops, passed in a String. How did that happen?'])}
+  {throw new Error(['Ooops, passed in a String. How did that happen?'])}
   
   if (Num1 > Num2)
   {
@@ -288,7 +289,7 @@ function Get_Smallest(Num1,Num2)
 function Get_Largest(Num1,Num2)
 {
   if(Num1===Num1.toString()||Num2===Num2.toString())
-  {new Error(['Ooops, passed in a String. How did that happen?'])}
+  {throw new Error(['Ooops, passed in a String. How did that happen?'])}
   
   if (Num1 < Num2)
   {
@@ -305,7 +306,7 @@ function Get_Largest(Num1,Num2)
 }
 
 function Silly_Sig_Switch(Sig_Total)
-{
+{ 
   if (Sig_Total==self.Num1_S)
   {
       console.log('ETHERR TRACER: <Sig_Total_EQU_Num1. Sigs and length equalent...>' + Sig_Total);
@@ -349,6 +350,7 @@ function Str_To_Int(list)
   }else{return list;}
 }
 
+//Note: this function unstable.
 function Int_To_Str(x,str,d)
 {
     var i = 0;
@@ -454,8 +456,9 @@ function Round_Point_Before()
   return; 
 }
 
-function A_Check()
-{ 
+function A_Check(Sig_Total)
+{   
+    //commented parts can be used for characters before the last one. If required. 
     console.log('A_Check: Sig_Total = '+Sig_Total);
     console.log('A_Check: Pointer at...'+self.result_S[Sig_Total]);
 
@@ -481,7 +484,9 @@ function A_Check()
       if (self.result_S[self.edx] =='.')
       {self.edx = Sig_Total;}
     console.log('A_Check: self.edx = '+self.edx);  
-    }
+    }else if(self.result_S[Str_To_Int(Sig_Total)+1] === undefined)
+    {self.ebx=false;console.log('A_Check: <Undefined last Char> self.ebx = '+self.ebx)}
+    else{self.ebx=false;console.log('A_Check: <No Round> self.ebx = '+self.ebx)}
 }
 
 //NOTES: 
@@ -491,12 +496,12 @@ function A_Check()
 //2.5 x 3.42. 
 //.29208*.23486
 //
-function Round_Off()
+function Round_Off(Sig_Total)
 {
   
   //-1 because array numbering starts at 0 
   self.Zero_Count = Sig_Total-1;
-//  console.log(self.Zero_Count);
+  //  console.log(self.Zero_Count);
   for (var i=self.transfer; i<self.result_Len-self.Overflow; i++) { 
     
     self.eax = self.result_S[i];
@@ -514,7 +519,8 @@ function Round_Off()
       }
     }
     
-    if (self.result_S[i+1] >=self.al&&self.Zero_Count == i&&self.float !==true)
+    if (self.result_S[i+1] >=self.al
+        &&self.Zero_Count == i&&self.float !==true&&self.ebx!==false)
     {
       
       self.eax++;
@@ -525,7 +531,7 @@ function Round_Off()
       
       self.result_R = self.eax;
       
-      console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
+      console.log('ETHERR TRACER: <ROUND_UP1. Rounded...>' + self.result_R);
       self.transfer = i;
       break;
     }else{
@@ -545,7 +551,15 @@ function Round_Off()
         
         if (self.ebx === false){self.eax--;}
         
-        if (i == self.edx){self.eax++;}
+        //To test: 2.5555+0.0555
+        if (i == self.edx)
+        {self.eax++;
+         console.log(self.eax);
+         if(self.eax == 10&&self.ebx === false)
+         {self.consistance = false;self.edx--;
+          console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Inconsistance! Restart the loop> Exception At:'+self.result_R+' Index:'+i); 
+         }      
+        }
         
         if(self.eax == 10){self.eax =0;}
         
@@ -595,7 +609,7 @@ function Round_Off()
           
         self.result_R = self.eax;
           
-        console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
+        console.log('ETHERR TRACER: <ROUND_UP2. Rounded...>' + self.result_R);
         self.transfer = i+1;
         break;
       }else{self.result_R = self.result_S[i];} 
@@ -654,7 +668,7 @@ function Sig_After_Dot(Sig_Total)
   return Sig_Total;
 }
 
-function Float_Point()
+function Check_Float()
 {
   for (var i=0; i<self.result_Len; i++) { 
     if (self.result_S[i]== '.')
@@ -664,9 +678,15 @@ function Float_Point()
       break;
     }else if (self.float !==true&&i+1==self.result_Len){
       console.log('Float == false');
-      return;
+      return false;
     }
   }
+  return self.float;
+}
+
+function Float_Point(Sig_Total)
+{
+    if(Check_Float()===false){return}
     var Old_float = self.float;
     Round_Point_After();
     Round_Point_Before();
@@ -693,9 +713,15 @@ function Float_Point()
     
     for (var edx = 0; edx<self.result_Len-self.Overflow; edx++ )
     {
-      self.Round = self.Round + Round_Off();
+      self.Round = self.Round + Round_Off(Sig_Total);
       console.log("ROUND STATE:"+self.Round);
       console.log('-------------------------');
+      if(self.consistance===false)
+      {edx=0;self.Round = [];
+       self.ecx = 0;self.transfer = 0;
+       self.Overflow--;
+       self.consistance=true;
+      }
       if(self.exit0){break;}
     }
     self.result_S = self.Round;
@@ -762,7 +788,7 @@ function mult(Sig_Total)
       return self.result_S;
     }
     
-    self.Overflow = self.result_Len - Sig_Total-1;
+    self.Overflow = self.result_Len - Sig_Total-1; //I cannot include this in Init_Var because previous functions modify Sig_Total.
     
     for (self.index = 0; self.index<self.v; self.index++)
     {
@@ -773,7 +799,7 @@ function mult(Sig_Total)
     }
     for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
     {
-      self.Round = self.Round + Round_Off();
+      self.Round = self.Round + Round_Off(Sig_Total);
       console.log("ROUND STATE:"+self.Round);
       console.log('-------------------------');
     }
@@ -813,7 +839,9 @@ function div(Sig_Total)
     {
       return self.result_S;
     }
-      
+    
+    self.Overflow = self.result_Len - Sig_Total-1;
+    
     for (self.index = 0; self.index<self.v; self.index++)
     {
     // My hand crafted substitute for .push API!
@@ -821,9 +849,9 @@ function div(Sig_Total)
       console.log(self.Zero);
       console.log('-------------------------');
     }
-    for (var ebx = 0; ebx<self.result_Len; ebx++ )
+    for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
     {
-      self.Round = self.Round + Round_Off();
+      self.Round = self.Round + Round_Off(Sig_Total);
       console.log("ROUND STATE:"+self.Round);
       console.log('-------------------------');
     }
@@ -843,17 +871,41 @@ function div(Sig_Total)
     return self.result_S;
   }else{return false;}
   } 
+//test function
+function Cmp_Float(Num1,Num2)
+{
+  Num1 = Num1.toString();
+  Num1 = Num2.toString();
+  Num1 = Num1.length;
+  Num2 = Num2.length;
+  if (Num1 > Num2)
+  {
+    return Num2;
+  }else if (Num1 < Num2){
+    return Num1;
+  }else if (Num1 == Num2){return Num2;
+  }else{return false;}
+}
+
 
 function Sig_Value_Check(Sig_Value)
 {
   if(self.Len_EQU)
   {Sig_Total = Sig_Value;
   }else if(self.Len_EQU===false)
-  { console.log(Str_To_Int(self.Num1_Old),Str_To_Int(self.Num2_Old));
+  { console.log(Number(self.Num1_Old),Number(self.Num2_Old));
+    if(Check_Float())
+    {
+      if(Cmp_Float(self.Num1_Old,self.Num2_Old)==self.Num1_Old.length)
+      {Sig_Total=self.Num1_Old.length-1}
+      if(Cmp_Float(self.Num1_Old,self.Num2_Old)==self.Num2_Old.length)
+      {Sig_Total=self.Num2_Old.length-1}
+      
+      return Sig_Total;
+    }else{Sig_Total=Sig_Value}
+    
       //In Progress...
-//    var small = Get_Smallest(Str_To_Int(self.Num1_Old),Str_To_Int(self.Num2_Old));
-//    console.log(small);
-//    Sig_Total = small.length-1;
+      //But works for the most part...
   }
   return Sig_Total;
 }
@@ -867,7 +919,7 @@ function add(Sig_Total,Sig_Value)
   if (Sig_Total >= 1)
   {
     
-    INIT_VAR(addition,5);
+    INIT_VAR(addition,6);
     
     Sig_Total = Sig_Value_Check(Sig_Value);
     console.log(Sig_Total);
@@ -915,6 +967,7 @@ function add(Sig_Total,Sig_Value)
   }else{return false;}
   }
   
+//Only positive numbers only so far...  
 function sub(Sig_Total)
 {
 
@@ -922,6 +975,9 @@ function sub(Sig_Total)
   {
     
     INIT_VAR(subtraction,6);
+    
+    Sig_Total = Sig_Value_Check(Sig_Value);
+    console.log(Sig_Total);
     
     self.result_F = Float_Point(Sig_Total);
     if (self.float === true)
@@ -934,6 +990,8 @@ function sub(Sig_Total)
     {
       return self.result_S;
     }
+    
+    self.Overflow = self.result_Len - Sig_Total-1;
       
     for (self.index = 0; self.index<self.v; self.index++)
     {
@@ -942,7 +1000,7 @@ function sub(Sig_Total)
       console.log('-------------------------');
     }
     
-    for (var ebx = 0; ebx<self.result_Len; ebx++ )
+    for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
     {
       self.Round = self.Round + Round_Off();
       console.log("ROUND STATE:"+self.Round);
@@ -967,7 +1025,7 @@ function sub(Sig_Total)
 Sig_Total = Get_Smallest(self.Num1_S,self.Num2_S);
 Sig_Value = Get_Largest(self.Num1_S,self.Num2_S);
 
-if (Penis=="m" && self.OnLoopFinish === true) {
+if (Operation=="m" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
@@ -981,7 +1039,7 @@ if (Penis=="m" && self.OnLoopFinish === true) {
   
 }
 
-else if (Penis=="d" && self.OnLoopFinish === true) {
+else if (Operation=="d" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
@@ -995,7 +1053,7 @@ else if (Penis=="d" && self.OnLoopFinish === true) {
   
 }
 
-else if (Penis=="a" && self.OnLoopFinish === true) {
+else if (Operation=="a" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
@@ -1009,7 +1067,7 @@ else if (Penis=="a" && self.OnLoopFinish === true) {
   
 }
 
-else if (Penis=="s" && self.OnLoopFinish === true) {
+else if (Operation=="s" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
   Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
