@@ -56,9 +56,7 @@ function I_like_This_Robust_Parser(Sig_Total)
     console.log('----------------------------------------');
     console.log('Elements:');
     console.log(self.Num1[i]);
-    self.Dot_Detected = false;
-    self.No_trail = false;
-    
+
     Sig_Total = Sig_Total + 1;
     console.log('Sigs:'+ Sig_Total);
     
@@ -98,7 +96,7 @@ function I_like_This_Robust_Parser(Sig_Total)
       console.log('ETHERR TRACER: <Saw_Trail_Zero. Removing sigs of Trail Zeroes...>' + Sig_Total);
     }
     
-    if(Number_Type(i) === true||self.Num2[i] == '.')
+    if(Number_Type(i) === true||self.Num1[i] == '.')
     {
       console.log('ETHERR TRACER: <Number_Status. Char is natural number or "."...>' + Sig_Total);
       self.Zero_Count = 0;
@@ -107,7 +105,7 @@ function I_like_This_Robust_Parser(Sig_Total)
       console.log('ETHERR TRACER: <Number_Status. Char is zero or Real...>Zero_Count= ' + self.Zero_Count);
     }
     
-    if (self.Zero_Count >= 2)
+    if (self.Zero_Count >= 2&&self.Dot_Detected ===false)
     {
       Sig_Total = Sig_Total - 1;
       self.LONG_TRAIL = true;
@@ -139,9 +137,7 @@ function I_like_This_Sexy_Parser(Sig_Total)
     console.log('----------------------------------------');
     console.log('Elements:');
     console.log(self.Num2[i]);
-    self.Dot_Detected = false;
-    self.No_trail = false;
-    
+
     Sig_Total = Sig_Total + 1;
     console.log('Sigs:'+ Sig_Total);
     
@@ -190,7 +186,7 @@ function I_like_This_Sexy_Parser(Sig_Total)
       console.log('ETHERR TRACER: <Number_Status. Char is zero or Real...>Zero_Count= ' + self.Zero_Count);
     }
     
-    if (self.Zero_Count >= 2)
+    if (self.Zero_Count >= 2&&self.Dot_Detected ===false)
     {
       Sig_Total = Sig_Total - 1;
       self.LONG_TRAIL = true;
@@ -261,13 +257,63 @@ function Silly_Sig_Switch(Sig_Total)
   }
 }
 
+function Integer_State(int)
+{
+  if(int & 1)
+  {
+      // ODD (1,3,5...)
+      return true;
+  }
+  else
+  {
+      // EVEN (2,4,8...)
+      return false;
+  }
+}
+
+function Next_char()
+{
+  console.log('ETHERR TRACER: <NEXT_CHAR. OLD length equ...>' + self.result_Len);
+  self.ecx = Sig_Total - 5;
+  self.ebx = Sig_Total - 3;
+  for (var i=0; i<self.result_Len; i++) {
+    if (self.New_Length > 1){
+      self.result_Len = self.New_Length-Sig_Total; // for 3 sig 5-3 will point at 2nd char
+    }else{
+      self.result_Len = self.result_Len-Sig_Total;
+    }
+    self.i = self.result_S[i];
+  }
+    self.result_Len = self.result_S.length;
+    if (Sig_Total>=4)
+    {
+    self.New_Length = self.result_Len + self.ecx; //note: base number = -1
+    console.log(self.ecx);
+    }
+    if (Sig_Total<=2)
+    {
+    self.New_Length = self.result_Len + self.ecx;
+    }
+    if (Integer_State(Sig_Total)===true)
+    {
+      self.New_Length = self.result_Len-self.ebx; //note: sig num increase by 2 so decrement has to be -2.
+    }
+    
+    console.log('ETHERR TRACER: <NEXT_CHAR. NEW length equ...>' + self.New_Length);
+    return self.i;
+  }  
+
+
 function Silly_Sig_Calc(Sig_Total)
 {
   if (Sig_Total >= 1)
   {
+    self.New_Length =0;
+    self.ecx = 0;
     Sig_Total = Sig_Total.toString();
     self.result_S = multiply.toString();
-    self.result = [self.result_S];
+    self.result_Len = self.result_S.length;
+//    self.result = [self.result_S];
     self.v = self.result_S.length - Sig_Total; //3
     self.n = self.Num1.length - Sig_Total;
     self.m = self.Num2.length - Sig_Total;
@@ -283,46 +329,58 @@ function Silly_Sig_Calc(Sig_Total)
       
     for (self.index = self.index; self.index<self.v; self.index++)
     {
-      appendItem(self.Zero, 0);
+      appendItem(self.Zero, '0');
       console.log(self.Zero.length);
       console.log('-------------------------');
     }
     
-    for (var i=0; i<self.result_S.length; i++) {
-      //var indexes = new Array();
-      
-      if (i === 0)
+      if (Sig_Total == 1)
       {
-        self.result_S = self.result_S[self.n]+1+self.Zero; //1 sig return whatever in index
+        self.result_S = self.result_S[self.n]+[self.Zero];
+      }
+      if (Sig_Total == 2)
+      {
+        self.result_S = self.result_S[self.n]+[Next_char()]+[self.Zero];
+      }
+      if (Sig_Total == 3)
+      {
+        self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[self.Zero];
+      }
+      if (Sig_Total == 4)
+      {
+        self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
+      }
+      if (Sig_Total == 5)
+      {
+        self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
+      }
+      if (Sig_Total == 6)
+      {
+        self.result_S = self.result_S[self.n]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[Next_char()]+[self.Zero];
       }
      
-      
-//      if (Sig_Total > 1){
-//        for (var u = 0; u < Sig_Total; u++) {
-//        removeItem(self.result_S[i], 0);  
-//        }
-//      }
-      
 //      self.result_S = self.result_S[self.n]+self.Zero; //1 sig return whatever in index
-//      self.result.push(self.result_S+self.Zero);
-      console.log(self.n);
-      
-    }
+//      self.result.push(self.result_S);
+//      console.log(self.n);
+
+  //  self.result = [self.result_S];
     return self.result_S;
   }else{return false;}
 }
 
 Sig_Total = Get_Smallest();
-console.log("----->FINAL SIG CALC = "+Sig_Total+"<---------------");
+console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
 Silly_Sig_Switch(Sig_Total);
+console.log("----------->SILLY MATH CALC START<---------------");
+self.result = Silly_Sig_Calc(Sig_Total);
 
 if (Penis=="m" && self.OnLoopFinish === true) {
-  console.log ('-------------------------------------------------');
+  console.log ('<------------------------------------------------->');
   console.log ('RESULT:');
   console.log(multiply);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
-  console.log(Silly_Sig_Calc(Sig_Total));
-
+  console.log(self.result);
+  
 }
 
 
