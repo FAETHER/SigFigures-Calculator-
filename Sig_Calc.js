@@ -1,5 +1,6 @@
 // Author: Kyryl(Etherr)
 // Project Started: 4/10/18  
+// viable project mult/div (4/23/18)
 
 var Penis = prompt("Multiplication, Division, Addition, or Subtraction?");
 var Num1 = [];
@@ -21,6 +22,8 @@ var addition = self.Num1+self.Num2 ;
 var subtraction = self.Num1-self.Num2 ;
 self.Num1 = self.Num1.toString();
 self.Num2 = self.Num2.toString();
+self.Num1_Old = self.Num1;
+self.Num2_Old = self.Num2;
 
 function Number_Type(i)
 {
@@ -151,6 +154,7 @@ function I_like_This_Robust_Parser(Sig_Total)
   self.LONG_TRAIL = false;
   self.carry = false;
   self.OnLoopFinish = true;
+  self.Num1 = self.Num1_Old;
   return Sig_Total;
 }
 
@@ -255,6 +259,7 @@ function I_like_This_Sexy_Parser(Sig_Total)
   self.LONG_TRAIL = false;
   self.carry = false;
   self.OnLoopFinish = true;
+  self.Num2 = self.Num2_Old;
   return Sig_Total;
 }
 
@@ -326,18 +331,52 @@ function Silly_Sig_Switch(Sig_Total)
   }
 }
 
+function Str_To_Int(list)
+{
+  var dec = 0;
+  var len = list.length;
+  for(var i=0; i<len; i++)
+  {
+    dec = dec*10+(list[i]-'0');
+  }
+  return dec;
+}
+
+function Int_To_Str(x,str,d)
+{
+    var i = 0;
+    //x is the input
+    //str will hold the buffer or converted result
+    //this function is unstable and will return a string as a whole
+    //for whole numbers it returns the last digit
+    //for floats it will return it as a string; trail zeros are discarded for unknown reason
+    while (x)
+    {
+        str[i++] = (x%10);
+        x = x/10;
+        break;
+    }
+//  Will add zeroes at the end    
+//  while (i < d)
+//  str[i++] = '0';
+    return i;
+}
+
 function Integer_State(int)
 {
+  if(int === int.toString()){
+   int = Str_To_Int(int);
+  }
   if(int & 1)
   {
       // ODD (1,3,5...)
       return true;
   }
-  else
+  else if( int & 1 === 0)
   {
       // EVEN (2,4,8...)
       return false;
-  }
+  }else{return null;}
 }
 
 function Next_char()
@@ -349,7 +388,7 @@ function Next_char()
   console.log('ETHERR TRACER: <NEXT_CHAR. NEW length equ...>' + self.New_Length);
   console.log('ETHERR TRACER: <NEXT_CHAR. ecx equ...>' + self.ecx);
   
-  for (var i=self.transfer; i<self.New_Length; i++) { 
+  for (var i=self.transfer; i<=self.New_Length; i++) { 
 
     self.New_Length = self.result_Len-self.ecx;  
     
@@ -359,9 +398,10 @@ function Next_char()
     
     // if i corresponds to the result value for that index --> break
     //The most beautiful code ever!!!
-    self.transfer = i;
+    self.transfer = i+1;
     if (i==self.ecx)
     {
+      console.log('ETHERR TRACER: <NEXT_CHAR. Break...>' );
       break;
     }
   }
@@ -375,7 +415,6 @@ function Round_Point_After()
   {
   for (var i = self.result_Len-1; i>=0; i--)
   {
-  //  console.log(self.result_S[i]);
     self.count_A = self.count_A + 1;
     
     if (self.result_S[i] == '.')
@@ -395,11 +434,11 @@ function Round_Point_Before()
   {
   for (var i=0; i<self.result_Len; i++)
   {
-  //  console.log(self.result_S[i]);
     self.count_B = self.count_B + 1;
     
     if (self.result_S[i] == '.')
     {
+      if(self.result_S[Sig_Total] == '.'){console.log('Round Float == false'); self.float = false;}
       console.log("ETHERR TRACER: <Dot_Detected_Before. Counter...>"+self.count_B);
       break;
     }
@@ -407,70 +446,89 @@ function Round_Point_Before()
   }
   return; 
 }
-  
+
+function A_Check()
+{
+    if (self.R_Dot){if (self.result_S[Sig_Total+1] >=5)
+    {self.ebx=false;}if (self.result_S[Sig_Total-1] >=5)
+    {self.edx = Sig_Total-2}return;}
+    if (self.result_S[Sig_Total+1] >=5&&self.R_Dot!==true)
+    {self.ebx=false;}if (self.result_S[Sig_Total] >=5)
+    {self.edx = Sig_Total-1;}
+}
+
 function Round_Off()
 {
   
   //-1 because array numbering starts at 0 
-  self.Zero_Count = self.result_Len-self.Zero.length-1;
-  // console.log(self.Zero_Count);
-  
-  for (var i=self.transfer; i<self.result_Len; i++) { 
-    if (self.result_S[i] >= 5&&self.Zero_Count == i&&self.float !==true)
+  self.Zero_Count = Sig_Total-1;
+  for (var i=self.transfer; i<self.result_S.length-self.Overflow; i++) { 
+    
+    self.eax = self.result_S[i];
+    
+    if (self.float!==true)
     {
-      self.eax = self.result_S[i];
+      if (self.result_S[i+1] == '.')
+      { if(self.result_S[i+2] >= 5)
+      {self.eax++;
+      self.result_R = self.eax;
+      console.log('ETHERR TRACER: <ROUND_UP. Whole answer, but float operands...>' + self.result_R);
+      self.exit0 = true;
+      break;
+      }
+      }
+    }
+    
+    if (self.result_S[i+1] >= 5&&self.Zero_Count == i&&self.float !==true)
+    {
       
-      if (self.result_S[i+1] >= 5){self.eax++;}
+      self.eax++;
       
-      if(self.eax == 10){self.eax =0;}
+      if(self.eax >= 10){self.eax =0;}
       
       if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
       
       self.result_R = self.eax;
       
       console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
-    }else{self.result_R = self.result_S[i];}
-    
-    if (self.result_S[i] < 5)
-    {
+      self.transfer = i;
+      break;
+    }else{
       self.result_R = self.result_S[i];
       console.log('ETHERR TRACER: <ROUND_DOWN. NULL...>' + self.result_R);
     }
-      
-    if (self.result_S[i+1] >= 5&&self.float ===true)
+    
+    if (self.result_S[i+1] >= 5&&self.float ===true&&self.result_S[i]!='.')
     {
-      self.Zero_Count = self.result_Len-self.Zero.length-self.count_A-1;
+      self.Zero_Count = self.count_B-1;
       console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT _A> = ' + self.Zero_Count);
       console.log('ETHERR TRACER: <Float_INDEX> = ' + i);
-      if (self.Zero_Count <= i)
+      if (i>=self.Zero_Count)
       {
-        self.eax = self.result_S[i];
+
+        self.eax++;
         
-        if (self.result_S[i+1] >= 5){self.eax++;}
+        if (self.ebx === false){self.eax--;}
         
-        if (self.result_S[i+1] == '.')
-        {
-          if (self.result_S[i+2] >= 5){self.eax++;}
-        }
+        if (i == self.edx){self.eax++;}
         
         if(self.eax == 10){self.eax =0;}
         
-        if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
+        if(i>self.edx){self.eax=0;}
         
         self.result_R = self.eax;
         
         console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded _A>' + self.result_R);
-        self.transfer = i;
+        self.transfer = i+1;
         break;
       }else{self.result_R = self.result_S[i];}
       
-      self.Zero_Count = self.count_B;
+      self.Zero_Count = self.count_B-2;
       console.log('ETHERR TRACER: <Float_Zero_Count_FLOAT _B> = ' + self.Zero_Count);
       if (self.Zero_Count == i)
       {
-        self.eax = self.result_S[i];
         
-        if (self.result_S[i+1] >= 5){self.eax++;}
+        self.eax++;
         
         if (self.result_S[i+1] == '.')
         {
@@ -484,7 +542,26 @@ function Round_Off()
         self.result_R = self.eax;
         
         console.log('ETHERR TRACER: <ROUND_UP_FLOAT. Rounded _B>' + self.result_R);
-      }else{self.result_R = self.result_S[i];}      
+        self.transfer = i+1;
+        break;
+      }else{self.result_R = self.result_S[i];}  
+      
+      self.Zero_Count = Sig_Total-1;
+      if (self.Zero_Count == i)
+      {
+        
+        self.eax++;
+          
+        if(self.eax >= 10){self.eax =0;}
+          
+        if(self.result_S[i-1] >= 5&&i > self.Zero_Count){self.eax=0;}
+          
+        self.result_R = self.eax;
+          
+        console.log('ETHERR TRACER: <ROUND_UP. Rounded...>' + self.result_R);
+        self.transfer = i+1;
+        break;
+      }else{self.result_R = self.result_S[i];} 
     }
     
     // 0. answer round
@@ -499,7 +576,7 @@ function Round_Off()
       }else{self.result_R = self.result_S[i];}
     }    
     
-    if (self.ecx == i){self.transfer = i; break;}
+    if (self.ecx == i){self.transfer = i+1; break;}
     
   }
   console.log('ETHERR TRACER: <ROUND_RETURN. ...>' + self.result_R);
@@ -512,7 +589,8 @@ function Sig_After_Dot(Sig_Total)
 {
   for (var i=0; i<self.result_Len; i++) 
   {
-    if(self.result_S[0]=='0'&&self.result_S[1]=='.') 
+    
+    if(self.result_S[0]=='0'&&self.result_S[1]=='.'&&self.R_Dot !==true) 
     {
       //This part is hardcoded for 0. possibility as an answer. 
       //fucking string; i am too lazy to convert it to int so do it by increment 2 times.
@@ -521,11 +599,22 @@ function Sig_After_Dot(Sig_Total)
       Sig_Total++;
       self.result_Len = self.result_S.length + 2;
       self.R_Dot = true;
+      
       console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Return sig +2...>'+Sig_Total);
       console.log('---------------------------------------------------');
+    }
+    self.eax = self.result_S[i];
+    if (self.eax=='0'&&self.R_Dot===true&&i>=2)
+    {
+      self.result_Len++;
+      Sig_Total++;
+    }else if (Integer_State(self.eax)!==null)
+    {
+      console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Float sig return...>'+Sig_Total);
       return Sig_Total;
-    }else{return Sig_Total;}
+    }    
   }
+  return Sig_Total;
 }
 
 function Float_Point()
@@ -545,7 +634,13 @@ function Float_Point()
     Round_Point_Before();
     Sig_Total = Sig_After_Dot(Sig_Total);
     
+    //keep 1 more char to parse just in case result is a whole.  
+    self.Overflow = self.result_Len - Sig_Total-1;
+    
     self.vF = self.result_S.length - Sig_Total-self.count_A;
+    if (self.div_whole){self.vF = self.result_S.length - Sig_Total-self.count_A-2;}
+    
+    console.log('ETHERR TRACER:<Trail zero inject ==>'+self.vF);
     
     if (self.R_Dot){self.vF = 0;}
     
@@ -556,11 +651,14 @@ function Float_Point()
       console.log('-------------------------');
     }
     
-    for (var edx = 0; edx<self.result_Len; edx++ )
+    A_Check();
+    
+    for (var edx = 0; edx<self.result_Len-self.Overflow; edx++ )
     {
       self.Round = self.Round + Round_Off();
       console.log("ROUND STATE:"+self.Round);
       console.log('-------------------------');
+      if(self.exit0){break;}
     }
     self.result_S = self.Round;
 
@@ -661,6 +759,8 @@ function div(Sig_Total)
     
     INIT_VAR();
     self.result_S = divide.toString();
+    
+    self.div_whole = true;
     
     self.result_F = Float_Point(Sig_Total);
     if (self.float === true)
