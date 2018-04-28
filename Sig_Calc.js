@@ -26,94 +26,83 @@ self.Num2 = self.Num2.toString();
 self.Num1_Old = self.Num1;
 self.Num2_Old = self.Num2;
 
-function Number_Type(i)
+function Number_Type(i,Num)
 {
   var Natural_Number = false;
   for(var num = 1; num>0; num++)
   {
-  if (self.Parser_ID == 1)
-  {
-    if (self.Num1[i]>=num)
+    if (Num[i]>=num)
     {
       Natural_Number = true;
       return Natural_Number;
-    }else if (self.Num1[i] != num){
+    }else if (Num[i] != num){
       Natural_Number = false;
       return Natural_Number;
     }
-  }else{
-    if (self.Num2[i]>=num)
-    {
-      Natural_Number = true;
-      return Natural_Number;
-    }else if (self.Num2[i] != num){
-      Natural_Number = false;
-      return Natural_Number;
     }
   }
-  }
-}
+  
 
-function I_like_This_Robust_Parser(Sig_Total)
+function I_like_This_Robust_Parser(Sig_Total,Num)
 {
   self.Zero_Count = 0;
   self.LONG_TRAIL = false;
   self.Dot_Detected = false;
-  self.Parser_ID = 1;
-  for (var i=0; i<self.Num1.length; i++) {
+  var ebx = 0;
+  for (var i=0; i<Num.length; i++) {
     console.log('----------------------------------------');
     console.log('Elements:');
-    console.log(self.Num1[i]);
+    console.log(Num[i]);
 
     Sig_Total = Sig_Total + 1;
     console.log('Sigs:'+ Sig_Total);
     
-    if (self.Num1[i] == '.')
+    if (Num[i] == '.')
     {
       Sig_Total = Sig_Total - 1;
       console.log('i see dot tok to t eeee! Removing sigFigure... ' + Sig_Total);
       self.Dot_Detected = true;
-      if (Number_Type(i-1) === true)
+      if (Number_Type(i-1,Num) === true)
       {
         console.log('ETHERR TRACER: <Real_Number_Before_Dot. Setting carry flag...>' + Sig_Total);
         self.carry = true;
       }
     } 
     
-    if (self.Num1[0] == '0'&&self.Dot_Detected !==true){
+    if (Num[ebx] == '0'&&self.Dot_Detected !==true){
       Sig_Total = Sig_Total - 1;
       console.log('ETHERR TRACER: <No_init_Zero. Removing sigFigure...>' + Sig_Total);
-    }
+    }else if (Num[i] == '-'){Sig_Total--;ebx++;console.log('ETHERR TRACER: <Negative_Number. Removing sigFigure...>' + Sig_Total);}
     
-    if (self.Num1[i] == '0'&&self.Dot_Detected ===true&&self.carry !== true){
+    if (Num[i] == '0'&&self.Dot_Detected ===true&&self.carry !== true){
       Sig_Total = Sig_Total - 1;
       console.log('ETHERR TRACER: <No_trail_Zero. Removing sigFigure...>' + Sig_Total);
       self.carry = false;
     }
     
-    if (self.Num1[i] != '0'&&self.Num1[i] != '.'&&self.Dot_Detected ===true){
+    if (Num[i] != '0'&&Num[i] != '.'&&self.Dot_Detected ===true){
       self.carry = true;
       console.log('ETHERR TRACER: <No_After_Dot_Zero. Setting carry flag...>' + Sig_Total);
     }  
     
-    if (self.Num1[i]!='0'&&self.Num1[i]!='.'&&self.Dot_Detected===false&&self.No_trail===false)
+    if (Num[i]!='0'&&Num[i]!='.'&&self.Dot_Detected===false&&self.No_trail===false)
     {
       self.No_trail = true;
       console.log('ETHERR TRACER: <No_Zero_Or_Dot. Ignoring flags...>' + Sig_Total);
     }else{self.No_trail = false;}
     
-    if (self.Num1[i] == '0'&&self.Num1[i] != '.'&&self.Dot_Detected ===false&&self.No_trail === true)
+    if (Num[i] == '0'&&Num[i] != '.'&&self.Dot_Detected ===false&&self.No_trail === true)
     {
       self.No_trail = false;
       Sig_Total = Sig_Total - 1;
       console.log('ETHERR TRACER: <Saw_Trail_Zero. Removing sigs of Trail Zeroes...>' + Sig_Total);
     }
     
-    if(Number_Type(i) === true||self.Num1[i] == '.')
+    if(Number_Type(i,Num) === true||Num[i] == '.')
     {
       console.log('ETHERR TRACER: <Number_Status. Char is natural number or "."...>' + Sig_Total);
       self.Zero_Count = 0;
-    }else if (self.Num1[i] == '0'){
+    }else if (Num[i] == '0'){
       self.Zero_Count++;
       console.log('ETHERR TRACER: <Number_Status. Char is zero or Real...>Zero_Count= ' + self.Zero_Count);
     }
@@ -123,26 +112,20 @@ function I_like_This_Robust_Parser(Sig_Total)
       Sig_Total = Sig_Total - 1;
       self.LONG_TRAIL = true;
       console.log('ETHERR TRACER: <Saw_Trail_Zero_Long. Removing sig figure...>' + Sig_Total);
-      if (Number_Type(i+1) === true)
+      if (Number_Type(i+1,Num) === true)
       {
         console.log("ETHERR TRACER: <Saw_Natural_Number_End. Restoring zero's sigs...>" + Sig_Total);
         Sig_Total = Sig_Total+self.Zero_Count;
       }
     }
     
-    if (i==self.Num1.length-1&&Number_Type(i) === false&&self.Dot_Detected !==true&&self.Zero_Count < 2)
+    if (i==Num.length-1&&Number_Type(i,Num) === false&&self.Dot_Detected !==true&&self.Zero_Count < 2)
     {
       console.log("ETHERR TRACER: <Saw_End_Zero. Removing sig figure...>" + Sig_Total);
       Sig_Total = Sig_Total - 1;
     }
     
-   //  if (self.Num1.length==2&&self.Zero_Count==1)
-   // {
-   //   Sig_Total = Sig_Total - 1;
-   //   console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
-   // }
-    
-    if (self.Num1[i] >=self.Num1.length)
+    if (Num[i] >=Num.length)
     {
     }else{self.OnLoopFinish = false;}
     
@@ -159,113 +142,8 @@ function I_like_This_Robust_Parser(Sig_Total)
   return Sig_Total;
 }
 
-function I_like_This_Sexy_Parser(Sig_Total)
-{
-  self.Zero_Count = 0;
-  self.LONG_TRAIL = false;
-  self.Dot_Detected = false;
-  self.Parser_ID = 2;
-  for (var i=0; i<self.Num2.length; i++) {
-    console.log('----------------------------------------');
-    console.log('Elements:');
-    console.log(self.Num2[i]);
-
-    Sig_Total = Sig_Total + 1;
-    console.log('Sigs:'+ Sig_Total);
-    
-    if (self.Num2[i] == '.')
-    {
-      Sig_Total = Sig_Total - 1;
-      console.log('i see dot tok to t eeee! Removing sigFigure... ' + Sig_Total);
-      self.Dot_Detected = true;
-      if (Number_Type(i-1) === true)
-      {
-        console.log('ETHERR TRACER: <Real_Number_Before_Dot. Setting carry flag...>' + Sig_Total);
-        self.carry = true;
-      }
-    } 
-    
-    if (self.Num2[0] == '0'&&self.Dot_Detected !==true){
-      Sig_Total = Sig_Total - 1;
-      console.log('ETHERR TRACER: <No_init_Zero. Removing sigFigure...>' + Sig_Total);
-    }
-    
-    if (self.Num2[i] == '0'&&self.Dot_Detected ===true&&self.carry !== true){
-      Sig_Total = Sig_Total - 1;
-      console.log('ETHERR TRACER: <No_trail_Zero. Removing sigFigure...>' + Sig_Total);
-      self.carry = false;
-    }
-    
-    if (self.Num2[i] != '0'&&self.Num2[i] != '.'&&self.Dot_Detected ===true){
-      self.carry = true;
-      console.log('ETHERR TRACER: <No_After_Dot_Zero. Setting carry flag...>' + Sig_Total);
-    }  
-    
-    if (self.Num2[i]!='0'&&self.Num2[i]!='.'&&self.Dot_Detected===false&&self.No_trail===false)
-    {
-      self.No_trail = true;
-      console.log('ETHERR TRACER: <No_Zero_Or_Dot. Ignoring flags...>' + Sig_Total);
-    }else{self.No_trail = false;}
-    
-    if (self.Num2[i] == '0'&&self.Num2[i] != '.'&&self.Dot_Detected ===false&&self.No_trail === true)
-    {
-      self.No_trail = false;
-      Sig_Total = Sig_Total - 1;
-      console.log('ETHERR TRACER: <Saw_Trail_Zero. Removing sigs of Trail Zeroes...>' + Sig_Total);
-    }
-    
-    if(Number_Type(i) === true || self.Num2[i] == '.')
-    {
-      console.log('ETHERR TRACER: <Number_Status. Char is natural number or "."...>' + Sig_Total);
-      self.Zero_Count = 0;
-    }else if (self.Num2[i] == '0'){
-      self.Zero_Count++;
-      console.log('ETHERR TRACER: <Number_Status. Char is zero or Real...>Zero_Count= ' + self.Zero_Count);
-    }
-    
-    if (self.Zero_Count >= 2&&self.Dot_Detected !==true)
-    {
-      Sig_Total = Sig_Total - 1;
-      self.LONG_TRAIL = true;
-      console.log('ETHERR TRACER: <Saw_Trail_Zero_Long. Removing sig figure...>' + Sig_Total);
-      if (Number_Type(i+1) === true)
-      {
-        console.log("ETHERR TRACER: <Saw_Natural_Number_End. Restoring zero's sigs...>" + Sig_Total);
-        Sig_Total = Sig_Total+self.Zero_Count;
-      }
-    }
-    
-    if (i==self.Num2.length-1&&Number_Type(i) === false&&self.Dot_Detected !==true&&self.Zero_Count < 2)
-    {
-      console.log("ETHERR TRACER: <Saw_End_Zero. Removing sig figure...>" + Sig_Total);
-      Sig_Total = Sig_Total - 1;
-    }
-    
-  //  if (self.Num2.length==2&&self.Zero_Count==1)
-  //  {
-   //   Sig_Total = Sig_Total - 1;
-   //   console.log('ETHERR TRACER: <Saw_Trail_Zero_Len_2. Removing sig figure...>' + Sig_Total);
-   // }
-    
-    if (self.Num2[i] >=self.Num2.length)
-    {
-    }else{self.OnLoopFinish = false;}
-    
-  }
-  if (self.LONG_TRAIL) {Sig_Total--;}
-  console.log("FINAL SEXY CALC = " + Sig_Total);
-  //cleanup
-  self.No_trail = false;
-  self.Zero_Count = 0;
-  self.LONG_TRAIL = false;
-  self.carry = false;
-  self.OnLoopFinish = true;
-  self.Num2 = self.Num2_Old;
-  return Sig_Total;
-}
-
-self.Num1_S = I_like_This_Robust_Parser(0);
-self.Num2_S = I_like_This_Sexy_Parser(0);
+self.Num1_S = I_like_This_Robust_Parser(0,self.Num1);
+self.Num2_S = I_like_This_Robust_Parser(0,self.Num2);
 
 function Get_Smallest(Num1,Num2)
 {
@@ -381,7 +259,7 @@ function Integer_State(int)
       // ODD (1,3,5...)
       return true;
   }
-  else if( int & 1 === 0)
+  else if( int%2 === 0 )
   {
       // EVEN (2,4,8...)
       return false;
@@ -467,7 +345,7 @@ function A_Check(Sig_Total)
     if (self.result_S[Sig_Total] >=self.al)
     {self.ebx=false;console.log('A_Check: <R_Dot> self.ebx = '+self.ebx);
 
-    if (self.result_S[Str_To_Int(Sig_Total)-1] >=self.al)
+    if (self.result_S[Str_To_Int(Sig_Total)] >=self.al)
     {self.edx = Sig_Total-1}//else{self.edx = Sig_Total-2}
     console.log('A_Check: <R_Dot> self.edx = '+self.edx); 
     Sig_Total = Sig_Total.toString();
@@ -519,6 +397,8 @@ function Round_Off(Sig_Total)
       }
     }
     
+    //to test: -324*1234 = -400000
+    //-0.7534*.87963
     if (self.result_S[i+1] >=self.al
         &&self.Zero_Count == i&&self.float !==true&&self.ebx!==false)
     {
@@ -640,8 +520,11 @@ function Sig_After_Dot(Sig_Total)
 {
   for (var i=0; i<self.result_Len; i++) 
   {
+    var ebx = 0;
     
-    if(self.result_S[0]=='0'&&self.result_S[1]=='.'&&self.R_Dot !==true) 
+    if (self.result_S[0]=='-'){ebx++;}
+    
+    if(self.result_S[ebx]=='0'&&self.result_S[ebx+1]=='.'&&self.R_Dot !==true) 
     {
       //This part is hardcoded for 0. possibility as an answer. 
       //fucking string; i am too lazy to convert it to int so do it by increment 2 times.
@@ -654,12 +537,15 @@ function Sig_After_Dot(Sig_Total)
       console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Return sig +2...>'+Sig_Total);
       console.log('---------------------------------------------------');
     }
+    
     self.eax = self.result_S[i];
-    if (self.eax=='0'&&self.R_Dot===true&&i>=2)
+    console.log('ETHERR TRACER: <ROUND_AFTER_DOT.> INDEX:'+i);
+  //  console.log(Integer_State(self.eax));
+    if (self.eax=='0'&&self.R_Dot===true&&i>=self.count_B)
     {
       self.result_Len++;
       Sig_Total++;
-    }else if (Integer_State(self.eax)!==null)
+    }else if (Integer_State(self.eax)!==null&&self.eax!=='0')
     {
       console.log('ETHERR TRACER: <ROUND_AFTER_DOT. Float sig return...>'+Sig_Total);
       return Sig_Total;
@@ -671,6 +557,10 @@ function Sig_After_Dot(Sig_Total)
 function Check_Float()
 {
   for (var i=0; i<self.result_Len; i++) { 
+    
+    if(Integer_State(self.result_S[i])===null&&self.result_S[i]!==0&&self.result_S[i]!== '.')
+    {console.log('Trash item:'+self.result_S[i]);self.trash++;}
+    
     if (self.result_S[i]== '.')
     {
       self.float = true;
@@ -690,7 +580,7 @@ function Float_Point(Sig_Total)
     var Old_float = self.float;
     Round_Point_After();
     Round_Point_Before();
-    Sig_Total = Sig_After_Dot(Sig_Total);
+    Sig_Total = Sig_After_Dot(Sig_Total)+self.trash;
 
     //keep 1 more char to parse just in case result is a whole.  
     self.Overflow = self.result_Len - Sig_Total-1;
@@ -728,17 +618,14 @@ function Float_Point(Sig_Total)
 
     self.ecx = 0;
     
-    //example of birwise xor in JS. Just for fun.
-    self.transfer = self.transfer ^ self.transfer;
+    self.transfer = 1;
     
     if (self.R_Dot){Sig_Total--;}
     
-    for (var ebx=0; ebx<Sig_Total-1; ebx++)
+    for (var ebx=0; ebx<Sig_Total; ebx++)
     {
       self.result_Sig =self.result_Sig+Next_char();
       console.log(self.result_Sig);
-      if (self.result_Sig[ebx] == '.')
-      {Sig_Total++;}
     }
     
     self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];
@@ -746,48 +633,8 @@ function Float_Point(Sig_Total)
   return self.result_S;    
 }
 
-function INIT_VAR(arg,Round_Min)
+function Whole_Num(Sig_Total)
 {
-    self.ecx = 0;
-    self.count_A = 0;
-    self.count_B = 0;
-    self.transfer = 0;
-    Sig_Total = Sig_Total.toString();
-    self.result_S = arg.toString();
-    self.result_Len = self.result_S.length;
-    self.v = self.result_S.length - Sig_Total; 
-    self.N_Zeros = self.result_S.length - 1;
-    self.index = 0;
-    self.n = 0;
-    self.Zero = [];
-    self.Round = [];
-    self.R_Dot = false;
-    self.result_Sig = [];
-    self.al = Round_Min; //this varible controls when to round UP or Down.
-    
-  return;  
-}
-
-function mult(Sig_Total)
-{
-
-  if (Sig_Total >= 1)
-  {
-    
-    INIT_VAR(multiply,5);
-  
-    self.result_F = Float_Point(Sig_Total);
-    if (self.float === true)
-    {
-      return self.result_F;
-    }
-
-    self.Num1 = self.result_S;
-    if (Sig_Total == I_like_This_Robust_Parser(0))
-    {
-      return self.result_S;
-    }
-    
     self.Overflow = self.result_Len - Sig_Total-1; //I cannot include this in Init_Var because previous functions modify Sig_Total.
     
     for (self.index = 0; self.index<self.v; self.index++)
@@ -813,9 +660,54 @@ function mult(Sig_Total)
       self.result_Sig =self.result_Sig+Next_char();
       console.log("NEXT_CHAR STATE:"+self.result_Sig);
     }
+    return;
+}
+
+function INIT_VAR(arg,Round_Min)
+{
+    self.ecx = 0;
+    self.count_A = 0;
+    self.count_B = 0;
+    self.transfer = 0;
+    Sig_Total = Sig_Total.toString();
+    self.result_S = arg.toString();
+    self.result_Len = self.result_S.length;
+    self.v = self.result_S.length - Sig_Total; 
+    self.N_Zeros = self.result_S.length - 1;
+    self.index = 0;
+    self.n = 0;
+    self.Zero = [];
+    self.Round = [];
+    self.R_Dot = false;
+    self.result_Sig = [];
+    self.al = Round_Min; //this varible controls when to round UP or Down.
+    self.trash = 0;
     
-   self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];
+  return;  
+}
+
+function mult(Sig_Total)
+{
+
+  if (Sig_Total >= 1)
+  {
     
+    INIT_VAR(multiply,5);
+  
+    self.result_F = Float_Point(Sig_Total);
+    if (self.float === true)
+    {
+      return self.result_F;
+    }
+
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
+    {
+      return self.result_S;
+    }
+     
+     Whole_Num(Sig_Total);
+     
+     self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];
     return self.result_S;
   }else{return false;}
   }
@@ -834,37 +726,12 @@ function div(Sig_Total)
       return self.result_F;
     }
     
-    self.Num1 = self.result_S;
-    if (Sig_Total == I_like_This_Robust_Parser(0))
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
     {
       return self.result_S;
     }
     
-    self.Overflow = self.result_Len - Sig_Total-1;
-    
-    for (self.index = 0; self.index<self.v; self.index++)
-    {
-    // My hand crafted substitute for .push API!
-      self.Zero = self.Zero+['0'];
-      console.log(self.Zero);
-      console.log('-------------------------');
-    }
-    for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
-    {
-      self.Round = self.Round + Round_Off(Sig_Total);
-      console.log("ROUND STATE:"+self.Round);
-      console.log('-------------------------');
-    }
-    self.result_S = self.Round;
-    //reset program counter
-    self.ecx = 0;
-    self.transfer = 1;
-    //This one is extremely important and cool piece of code!
-    for (var i=0; i<Sig_Total-1; i++)
-    {
-      self.result_Sig =self.result_Sig+Next_char();
-      console.log("NEXT_CHAR STATE:"+self.result_Sig);
-    }
+     Whole_Num(Sig_Total);
     
      self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];
     
@@ -890,17 +757,18 @@ function Cmp_Float(Num1,Num2)
 
 function Sig_Value_Check(Sig_Value)
 {
+  if(self.result_S[0]=='0'&&self.result_S[1]=='.'){return Sig_Total;} 
   if(self.Len_EQU)
-  {Sig_Total = Sig_Value;
+  { if(Check_Float()){Sig_Total = Sig_Value+1;}
+    Sig_Total = Sig_Value;
   }else if(self.Len_EQU===false)
   { console.log(Number(self.Num1_Old),Number(self.Num2_Old));
     if(Check_Float())
     {
       if(Cmp_Float(self.Num1_Old,self.Num2_Old)==self.Num1_Old.length)
-      {Sig_Total=self.Num1_Old.length-1}
+      {Sig_Total=self.Num1_Old.length}else
       if(Cmp_Float(self.Num1_Old,self.Num2_Old)==self.Num2_Old.length)
-      {Sig_Total=self.Num2_Old.length-1}
-      
+      {Sig_Total=self.Num2_Old.length}
       return Sig_Total;
     }else{Sig_Total=Sig_Value}
     
@@ -930,36 +798,12 @@ function add(Sig_Total,Sig_Value)
       return self.result_F;
     }
     
-    self.Num1 = self.result_S;
-    if (Sig_Total == I_like_This_Robust_Parser(0))
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
     {
       return self.result_S;
     }
     
-    self.Overflow = self.result_Len - Sig_Total-1;
-      
-    for (self.index = 0; self.index<self.v; self.index++)
-    {
-      self.Zero = self.Zero+['0'];
-      console.log(self.Zero);
-      console.log('-------------------------');
-    }
-    
-    for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
-    {
-      self.Round = self.Round + Round_Off();
-      console.log("ROUND STATE:"+self.Round);
-      console.log('-------------------------');
-    }
-    self.result_S = self.Round;
-    self.ecx = 0;
-    self.transfer = 1;
-
-    for (var i=0; i<Sig_Total-1; i++)
-    {
-      self.result_Sig =self.result_Sig+Next_char();
-      console.log("NEXT_CHAR STATE:"+self.result_Sig);
-    }
+    Whole_Num(Sig_Total);
     
     self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];    
 
@@ -985,36 +829,12 @@ function sub(Sig_Total)
       return self.result_F;
     }
     
-    self.Num1 = self.result_S;
-    if (Sig_Total == I_like_This_Robust_Parser(0))
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
     {
       return self.result_S;
     }
     
-    self.Overflow = self.result_Len - Sig_Total-1;
-      
-    for (self.index = 0; self.index<self.v; self.index++)
-    {
-      self.Zero = self.Zero+['0'];
-      console.log(self.Zero);
-      console.log('-------------------------');
-    }
-    
-    for (var ebx = 0; ebx<self.result_Len-self.Overflow; ebx++ )
-    {
-      self.Round = self.Round + Round_Off();
-      console.log("ROUND STATE:"+self.Round);
-      console.log('-------------------------');
-    }
-    self.result_S = self.Round;
-    self.ecx = 0;
-    self.transfer = 1;
-
-    for (var i=0; i<Sig_Total-1; i++)
-    {
-      self.result_Sig =self.result_Sig+Next_char();
-      console.log("NEXT_CHAR STATE:"+self.result_Sig);
-    }
+    Whole_Num(Sig_Total);
     
     self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];    
 
