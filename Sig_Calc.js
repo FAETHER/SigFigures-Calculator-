@@ -7,24 +7,29 @@ var Num1 = [];
 var Num2 = []; 
 var Sig_Total = 0;
 var Sig_Value = 0;
+var Operand_Count=1;
+var multiply ;
+var divide ;
+var addition ;
+var subtraction ;
 // instruction pointer or EIP in x86 assembly.
 var self = 
 {
   first: Num1,
   second: Num2
 };
+self.buffer = [];
+self.edi =0;
+//self.Num1 = prompt("First Number?");
+//self.Num2 = prompt("Second Number?");
+//if(self.Num1===null||self.Num2===null){throw new Error(['Ooops, no input. How did that happen? :trollfaceXD'])}
+//self.Num1 = self.Num1.toString();
+//self.Num2 = self.Num2.toString();
+//self.Num1_Old = self.Num1;
+//self.Num2_Old = self.Num2;
 
-self.Num1 = prompt("First Number?");
-self.Num2 = prompt("Second Number?");
-var multiply = Number(self.Num1)*Number(self.Num2) ;
-var divide = Number(self.Num1)/Number(self.Num2) ;
-var addition = Number(self.Num1)+Number(self.Num2) ;
-var subtraction = Number(self.Num1)-Number(self.Num2) ;
-//if(self.Num1||self.Num2===null){throw new Error(['Ooops, no input. How did that happen? :trollfaceXD'])}
-self.Num1 = self.Num1.toString();
-self.Num2 = self.Num2.toString();
-self.Num1_Old = self.Num1;
-self.Num2_Old = self.Num2;
+function main()
+{
 
 function Number_Type(i,Num)
 {
@@ -41,7 +46,51 @@ function Number_Type(i,Num)
     }
     }
   }
-  
+
+self.op_Len=0;  
+self.index=0;
+function Parse_Input(Num1)
+{
+  console.log('----------------------------------------');
+  console.log(Operation);
+  for (var i=self.index; i<Operation.length; i++)
+  {
+    console.log('Element: '+Operation[i]);
+    
+    console.log('Operand = '+self.operand);
+    if(Operation[i]=='-'||Operation[i]=='+')
+    {
+      if(self.operand!==true)
+      {
+      self.sign = true;
+      console.log('ETHERR TRACER: <Parse_Input. Sign,passing...>'+Operation[i]);
+      }
+    }
+    if(Number_Type(i,Operation)===true||Operation[i]=='0'||Operation[i]=='.'||self.sign===true)
+    { 
+      if(i==self.index+1){self.sign = false;}
+      self.operand = true;
+      self.op_Len++;
+      console.log('ETHERR TRACER: <Parse_Input. Operand start...>'+Operation[i]);
+      Num1 = Num1+Operation[i];
+    }
+    if(Operation[i]=='+'||Operation[i]=='-'||Operation[i]=='*'||Operation[i]=='/')
+    {
+      if(self.operand===true&&self.sign!==true)
+      {
+      self.op_End = true;
+      self.operand = false;
+      Operand_Count++;
+      self.op_Len=0; 
+      self.index=i+1;
+      self.Verb = Operation[i];
+      console.log('ETHERR TRACER: <Parse_Input. Operand end...>'+Operation[i]);
+      break;
+      }
+    }else if(i==Operation.length-1&&self.op_End!==true) {throw new Error(['Ooops, no operation spec. How did that happen?'])}
+  }
+  return Num1;
+}
 
 function I_like_This_Robust_Parser(Sig_Total,Num)
 {
@@ -142,50 +191,9 @@ function I_like_This_Robust_Parser(Sig_Total,Num)
   return Sig_Total;
 }
 
-self.Num1_S = I_like_This_Robust_Parser(0,self.Num1);
-self.Num2_S = I_like_This_Robust_Parser(0,self.Num2);
-
-function Get_Smallest(Num1,Num2)
-{
-  if(Num1===Num1.toString()||Num2===Num2.toString())
-  {throw new Error(['Ooops, passed in a String. How did that happen?'])}
-  
-  if (Num1 > Num2)
-  {
-    self.n = self.Num2.length - self.Num2_S;
-    return Num2;
-  }else if (Num1 < Num2){
-    self.n = self.Num1.length - self.Num1_S;
-    return Num1;
-  }else if (Num1 == Num2){
-    return Num2;
-  }else{
-    return false;
-  }
-}
-
-function Get_Largest(Num1,Num2)
-{
-  if(Num1===Num1.toString()||Num2===Num2.toString())
-  {throw new Error(['Ooops, passed in a String. How did that happen?'])}
-  
-  if (Num1 < Num2)
-  {
-    self.n = self.Num2.length - self.Num2_S;
-    return Num2;
-  }else if (Num1 > Num2){
-    self.n = self.Num1.length - self.Num1_S;
-    return Num1;
-  }else if (Num1 == Num2){
-    return Num2;
-  }else{
-    return false;
-  }
-}
-
 function Silly_Sig_Switch(Sig_Total)
 { 
-  if (Sig_Total==self.Num1_S)
+  if (self.Num2_S==self.Num1_S)
   {
       console.log('ETHERR TRACER: <Sig_Total_EQU_Num1. Sigs and length equalent...>' + Sig_Total);
       self.EQU1 = true;
@@ -203,14 +211,14 @@ function Silly_Sig_Switch(Sig_Total)
       self.EQU2 = false;
   }  
   
-  if (self.Num1.length == self.Num2.length)
-  {
-    console.log('ETHERR TRACER: <Len_EQU_Len. length equalent...>' + self.Num1.length+"|||"+self.Num2.length);
-    self.Len_EQU = true;
-  }else{
-    console.log('ETHERR TRACER: <Len_NOEQU_Len. length NOP...>' + self.Num1.length+"|||"+self.Num2.length);
-    self.Len_EQU = false;
-  }
+//  if (self.Num1.length == self.Num2.length)
+//  {
+//    console.log('ETHERR TRACER: <Len_EQU_Len. length equalent...>' + self.Num1.length+"|||"+self.Num2.length);
+//    self.Len_EQU = true;
+//  }else{
+//    console.log('ETHERR TRACER: <Len_NOEQU_Len. length NOP...>' + self.Num1.length+"|||"+self.Num2.length);
+//    self.Len_EQU = false;
+//  }
 }
 
 //Note: this function cant convert floats.
@@ -261,9 +269,69 @@ function Integer_State(int)
   }
   else if( int%2 === 0 )
   {
-      // EVEN (2,4,8...)
+      // EVEN (2,4,6,8...)
       return false;
   }else{return null;}
+}
+
+function Get_Smallest(i,Num)
+{
+  self.len = Num.length;
+  for(i=0; i<self.len; i++)
+  {
+    if(Num[i]==',')
+    { self.end=true;
+      self.edi=0;
+    }
+    console.log("Get_Smallest: EDI ="+self.edi);
+    if(Integer_State(Num[i])!==null||Num[i]=='0')
+    { 
+      if(self.end){self.end=false;}
+      self.CMP = Num[i];
+      self.edi++;
+      console.log("Get_Smallest: <INSIDE>"+self.edi);
+      if(Integer_State(Num[i+self.edi])!==null||Num[i+self.edi]=='0')
+      {
+        for(var a=0; a<self.edi; a++)
+        {self.CMP = Num[i]+Num[i+self.edi];i++;self.len++;}
+      }
+      }
+    if(Num[i]!==',')
+    {
+      console.log("Get_Smallest: CMP="+self.CMP);
+      console.log("Get_Smallest: NUM"+Num[i+2]);
+    if (Str_To_Int(self.CMP) > Str_To_Int(Num[i+2]))
+    {
+      return Num[i+2];
+    }else if (Str_To_Int(self.CMP) < Str_To_Int(Num[i+2])){
+      return self.CMP;
+    }else if (Str_To_Int(self.CMP) == Str_To_Int(Num[i+2])){
+      return Num[i+2];
+    }else{
+      return false;
+    }
+    }
+  }
+}
+
+
+function Get_Largest(Num1,Num2)
+{
+  if(Num1===Num1.toString()||Num2===Num2.toString())
+  {Num1=Number(Num1);Num2=Number(Num2);
+   console.log("ETHERR TRACER: <Get_Largest. Passed in a string... trying fallback to num>");
+  }
+  
+  if (Num1 < Num2)
+  {
+    return Num2;
+  }else if (Num1 > Num2){
+    return Num1;
+  }else if (Num1 == Num2){
+    return Num2;
+  }else{
+    return false;
+  }
 }
 
 function Next_char()
@@ -325,7 +393,7 @@ function Round_Point_Before()
     
     if (self.result_S[i] == '.')
     {
-      if(self.result_S[Sig_Total] == '.'){console.log('Round Float == false'); self.float = false;}
+      if(self.result_S[Str_To_Int(Sig_Total)+self.trash] == '.'){console.log('Round Float == false'); self.float = false;}
       console.log("ETHERR TRACER: <Dot_Detected_Before. Counter...>"+self.count_B);
       break;
     }
@@ -336,7 +404,7 @@ function Round_Point_Before()
 
 function A_Check(Sig_Total)
 {   
-    //commented parts can be used for characters before the last one. If required. 
+
     console.log('A_Check: Sig_Total = '+Sig_Total);
     console.log('A_Check: Pointer at...'+self.result_S[Sig_Total]);
 
@@ -346,7 +414,7 @@ function A_Check(Sig_Total)
     {self.ebx=false;console.log('A_Check: <R_Dot> self.ebx = '+self.ebx);
 
     if (self.result_S[Str_To_Int(Sig_Total)] >=self.al)
-    {self.edx = Sig_Total-1}//else{self.edx = Sig_Total-2}
+    {self.edx = Sig_Total-1}
     console.log('A_Check: <R_Dot> self.edx = '+self.edx); 
     Sig_Total = Sig_Total.toString();
     return;}}
@@ -357,8 +425,6 @@ function A_Check(Sig_Total)
     
     if (self.result_S[Str_To_Int(Sig_Total)+1] >=self.al)
     {self.edx = Sig_Total;}
-//    if (self.result_S[Str_To_Int(Sig_Total)-1] >=self.al)
-//    {self.edx = Sig_Total-1;
       if (self.result_S[self.edx] =='.')
       {self.edx = Sig_Total;}
     console.log('A_Check: self.edx = '+self.edx);  
@@ -369,7 +435,7 @@ function A_Check(Sig_Total)
 
 //NOTES: 
 //Check 5.5/345; no work (solved)
-//543.34*0.34551
+//543.34*0.34551 = 187.73
 //555.5*55.55
 //2.5 x 3.42. 
 //.29208*.23486
@@ -386,19 +452,35 @@ function Round_Off(Sig_Total)
     
     if (self.float!==true)
     {
+      console.log(self.edx);
+      self.bl = self.edx-1;
+      if(self.edx<=0+self.trash&&i===self.edx&&self.consistance === true)
+      {self.eax++;self.transfer++;console.log('ETHERR TRACER: <ROUND_UP.> Round at 0 index '+self.edx);return self.eax;}
       if (self.result_S[i+1] == '.')
       { if(self.result_S[i+2] >= self.al)
-      {self.eax++;
-      self.result_R = self.eax;
-      console.log('ETHERR TRACER: <ROUND_UP. Whole answer, but float operands...>' + self.result_R);
-      self.exit0 = true;
-      break;
+      {
+        self.eax++;
+        if (self.ebx === false){self.eax--;}
+        if (i == self.bl)
+        {self.eax++;
+         console.log(self.eax);
+         if(self.eax == 10&&self.ebx === false)
+         {self.consistance = false;self.edx=self.edx-2;
+          console.log('ETHERR TRACER: <ROUND_UP.> Inconsistance! Restart the loop> Exception At:'+self.result_R+' Index:'+i); 
+         }      
+        }
+        if(self.eax >= 10){self.eax =0;}
+        if(i>self.edx){self.eax=0;}
+        self.result_R = self.eax;
+        console.log('ETHERR TRACER: <ROUND_UP.> Whole answer, but float operands...>' + self.result_R);
+        break;
       }
       }
     }
     
     //to test: -324*1234 = -400000
-    //-0.7534*.87963
+    //-0.7534*.87963 = -0.6627
+    //273.2/5.5 = 50
     if (self.result_S[i+1] >=self.al
         &&self.Zero_Count == i&&self.float !==true&&self.ebx!==false)
     {
@@ -558,7 +640,7 @@ function Check_Float()
 {
   for (var i=0; i<self.result_Len; i++) { 
     
-    if(Integer_State(self.result_S[i])===null&&self.result_S[i]!==0&&self.result_S[i]!== '.')
+    if(Integer_State(self.result_S[i])===null&&self.result_S[i]!=='0'&&self.result_S[i]!== '.')
     {console.log('Trash item:'+self.result_S[i]);self.trash++;}
     
     if (self.result_S[i]== '.')
@@ -622,10 +704,14 @@ function Float_Point(Sig_Total)
     
     if (self.R_Dot){Sig_Total--;}
     
-    for (var ebx=0; ebx<Sig_Total; ebx++)
+    console.log('ETHERR TRACER:<SigTotal to parse... ==>'+Sig_Total);
+    
+    for (var ebx=0; ebx<Sig_Total-1; ebx++)
     {
       self.result_Sig =self.result_Sig+Next_char();
       console.log(self.result_Sig);
+      if (self.result_Sig[ebx] == '.')
+      {Sig_Total++;}
     }
     
     self.result_S = self.result_S[0]+[self.result_Sig]+[',']+[self.Zero];
@@ -726,7 +812,7 @@ function div(Sig_Total)
       return self.result_F;
     }
     
-    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S)||self.EQU1)
     {
       return self.result_S;
     }
@@ -829,7 +915,7 @@ function sub(Sig_Total)
       return self.result_F;
     }
     
-    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S))
+    if (Sig_Total == I_like_This_Robust_Parser(0,self.result_S)||self.EQU1)
     {
       return self.result_S;
     }
@@ -842,16 +928,54 @@ function sub(Sig_Total)
   }else{return false;}
   }  
 
-Sig_Total = Get_Smallest(self.Num1_S,self.Num2_S);
-Sig_Value = Get_Largest(self.Num1_S,self.Num2_S);
 
-if (Operation=="m" && self.OnLoopFinish === true) {
+
+for(var l=0; l<Operand_Count; l++)
+{
+  var eax = Number(Parse_Input([]));
+  var ebx;
+  console.log(eax);
+  console.log(ebx);
+  console.log(l);
+  console.log(self.Verb);
+  if(Integer_State(l)===true&&l!==0)
+  { ebx = eax;self.con=true;console.log("self.con=true");
+    self.Num = I_like_This_Robust_Parser(0,ebx.toString());
+  }else
+  {
+    self.Num = I_like_This_Robust_Parser(0,eax.toString());
+  }
+  
+  //be ready to overflow your buffers !XD
+  self.buffer = self.buffer +[','] + self.Num;
+  console.log("KERNEL CORE: <BUFFER MEM=>"+self.buffer);
+  
+  if(self.con)
+  {
+   multiply = eax*ebx ;
+   divide =  eax/ebx;
+   addition = eax+ebx  ;
+   subtraction = eax-ebx ;
+  
+  console.log(eax);
+  Sig_Total = Get_Smallest(0,self.buffer);
+  console.log("SIGTOTAL"+Sig_Total);
+  Sig_Value = Get_Largest(self.buffer);
+  }
+}
+
+//self.Num1_S = I_like_This_Robust_Parser(0,self.Num1);
+//self.Num2_S = I_like_This_Robust_Parser(0,self.Num2);
+//Sig_Total = Get_Smallest(self.Num1_S,self.Num2_S);
+//Sig_Value = Get_Largest(self.Num1_S,self.Num2_S);
+
+if (self.Verb=="*" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
-  Silly_Sig_Switch(Sig_Total);
+//  Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = mult(Sig_Total);
   console.log ('<------------------------------------------------->');
-  console.log("Operands:"+self.Num1 + "*" + self.Num2);
+//  console.log("Operands:"+self.Num1 + "*" + self.Num2);
   console.log ('RESULT:');
   console.log(multiply);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -859,13 +983,13 @@ if (Operation=="m" && self.OnLoopFinish === true) {
   
 }
 
-else if (Operation=="d" && self.OnLoopFinish === true) {
+else if (self.Verb=="/" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
-  Silly_Sig_Switch(Sig_Total);
+//  Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = div(Sig_Total);
   console.log ('<------------------------------------------------->');
-  console.log("Operands:"+self.Num1 + "/" + self.Num2);
+//  console.log("Operands:"+self.Num1 + "/" + self.Num2);
   console.log ('RESULT:');
   console.log(divide);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -873,13 +997,13 @@ else if (Operation=="d" && self.OnLoopFinish === true) {
   
 }
 
-else if (Operation=="a" && self.OnLoopFinish === true) {
+else if (self.Verb=="+" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
-  Silly_Sig_Switch(Sig_Total);
+//  Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = add(Sig_Total,Sig_Value);
   console.log ('<------------------------------------------------->');
-  console.log("Operands:"+self.Num1 + "+" + self.Num2);
+//  console.log("Operands:"+self.Num1 + "+" + self.Num2);
   console.log ('RESULT:');
   console.log(addition);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -887,13 +1011,13 @@ else if (Operation=="a" && self.OnLoopFinish === true) {
   
 }
 
-else if (Operation=="s" && self.OnLoopFinish === true) {
+else if (self.Verb=="-" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
-  Silly_Sig_Switch(Sig_Total);
+//  Silly_Sig_Switch(Sig_Total);
   console.log("----------->SILLY MATH CALC START<---------------");
   self.result = sub(Sig_Total,Sig_Value);
   console.log ('<------------------------------------------------->');
-  console.log("Operands:"+self.Num1 + "-" + self.Num2);
+//  console.log("Operands:"+self.Num1 + "-" + self.Num2);
   console.log ('RESULT:');
   console.log(subtraction);
   console.log ('SIGFIGURES OR FAKE MATH RESULT:');
@@ -901,7 +1025,15 @@ else if (Operation=="s" && self.OnLoopFinish === true) {
   
 }
 
+}
 
+
+var start = new Date().getTime();
+main();
+var end = new Date().getTime();
+var time = end - start;
+console.log ('<------------------------------------------------->');
+console.log('Script execution time: ' + time+" ms. or "+time/1000+" s.");
 
 
 
