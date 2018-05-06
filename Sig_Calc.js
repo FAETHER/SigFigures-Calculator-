@@ -19,14 +19,11 @@ var self =
   second: Num2
 };
 self.buffer = [];
+self.construct = [];
 self.edi =0;
-//self.Num1 = prompt("First Number?");
-//self.Num2 = prompt("Second Number?");
-//if(self.Num1===null||self.Num2===null){throw new Error(['Ooops, no input. How did that happen? :trollfaceXD'])}
-//self.Num1 = self.Num1.toString();
-//self.Num2 = self.Num2.toString();
-//self.Num1_Old = self.Num1;
-//self.Num2_Old = self.Num2;
+
+
+
 
 function main()
 {
@@ -221,6 +218,47 @@ function Silly_Sig_Switch(Sig_Total)
 //  }
 }
 
+function expr (str) {
+    var chars = str.split("");
+    var n = [], op = [], index = 0, oplast = true;
+
+    n[index] = "";
+
+    // Parse the expression
+    for (var c = 0; c < chars.length; c++) {
+
+        if (isNaN(parseInt(chars[c])) && chars[c] !== "." && !oplast) {
+            op[index] = chars[c];
+            index++;
+            n[index] = "";
+            oplast = true;
+        } else {
+            n[index] += chars[c];
+            oplast = false;
+        }
+    }
+    // Calculate the expression
+    str = parseFloat(n[0]);
+    for (var o = 0; o < op.length; o++) {
+        var num = parseFloat(n[o + 1]);
+        switch (op[o]) {
+            case "+":
+                str = str + num;
+                break;
+            case "-":
+                str = str - num;
+                break;
+            case "*":
+                str = str * num;
+                break;
+            case "/":
+                str = str / num;
+                break;
+        }
+    }
+    return str;
+}
+
 //Note: this function cant convert floats.
 function Str_To_Int(list)
 {
@@ -315,22 +353,43 @@ function Get_Smallest(i,Num)
 }
 
 
-function Get_Largest(Num1,Num2)
+function Get_Largest(i,Num)
 {
-  if(Num1===Num1.toString()||Num2===Num2.toString())
-  {Num1=Number(Num1);Num2=Number(Num2);
-   console.log("ETHERR TRACER: <Get_Largest. Passed in a string... trying fallback to num>");
-  }
-  
-  if (Num1 < Num2)
+  self.len = Num.length;
+  for(i=0; i<self.len; i++)
   {
-    return Num2;
-  }else if (Num1 > Num2){
-    return Num1;
-  }else if (Num1 == Num2){
-    return Num2;
-  }else{
-    return false;
+    if(Num[i]==',')
+    { self.end=true;
+      self.edi=0;
+    }
+    console.log("Get_Largest: EDI ="+self.edi);
+    if(Integer_State(Num[i])!==null||Num[i]=='0')
+    { 
+      if(self.end){self.end=false;}
+      self.CMP = Num[i];
+      self.edi++;
+      console.log("Get_Largest: <INSIDE>"+self.edi);
+      if(Integer_State(Num[i+self.edi])!==null||Num[i+self.edi]=='0')
+      {
+        for(var a=0; a<self.edi; a++)
+        {self.CMP = Num[i]+Num[i+self.edi];i++;self.len++;}
+      }
+      }
+    if(Num[i]!==',')
+    {
+      console.log("Get_Largest: CMP="+self.CMP);
+      console.log("Get_Largest: NUM"+Num[i+2]);
+    if (Str_To_Int(self.CMP) < Str_To_Int(Num[i+2]))
+    {
+      return Num[i+2];
+    }else if (Str_To_Int(self.CMP) > Str_To_Int(Num[i+2])){
+      return self.CMP;
+    }else if (Str_To_Int(self.CMP) == Str_To_Int(Num[i+2])){
+      return Num[i+2];
+    }else{
+      return false;
+    }
+    }
   }
 }
 
@@ -929,45 +988,57 @@ function sub(Sig_Total)
   }  
 
 
+var verb = expr(Operation);
 
 for(var l=0; l<Operand_Count; l++)
 {
   var eax = Number(Parse_Input([]));
   var ebx;
-  console.log(eax);
-  console.log(ebx);
-  console.log(l);
-  console.log(self.Verb);
+  var ebp;
+  var construct_Old;
+  var last_OP = 0;
+  console.log(verb);
+  
   if(Integer_State(l)===true&&l!==0)
   { ebx = eax;self.con=true;console.log("self.con=true");
     self.Num = I_like_This_Robust_Parser(0,ebx.toString());
   }else
   {
+    ebp = eax;
     self.Num = I_like_This_Robust_Parser(0,eax.toString());
   }
   
-  //be ready to overflow your buffers !XD
   self.buffer = self.buffer +[','] + self.Num;
+
+  if(Integer_State(l)===true)
+  {self.construct = ebp + ebx;}
+  if(l==Operand_Count-1&&Integer_State(Operand_Count))
+  {last_OP = eax;}
+  console.log("LAST OP = "+last_OP);
+    
+  console.log('EBP= '+ebp);
+  console.log('EAX= '+eax);
+  console.log('EBX= '+ebx);
   console.log("KERNEL CORE: <BUFFER MEM=>"+self.buffer);
-  
-  if(self.con)
+  console.log("KERNEL CORE: <CONSTRUCT MEM=>"+self.construct);
+  if(Integer_State(l)===false&&l>=1&&Integer_State(Operand_Count)!==true)
   {
-   multiply = eax*ebx ;
-   divide =  eax/ebx;
-   addition = eax+ebx  ;
-   subtraction = eax-ebx ;
+    construct_Old = self.construct;
+  }    
   
-  console.log(eax);
-  Sig_Total = Get_Smallest(0,self.buffer);
-  console.log("SIGTOTAL"+Sig_Total);
-  Sig_Value = Get_Largest(self.buffer);
-  }
+  addition =  verb;//construct_Old + self.construct + last_OP;  
+  multiply = verb;//construct_Old * self.construct * last_OP;  
+  divide =   verb;//construct_Old / self.construct / last_OP;  
+  subtraction = verb;//construct_Old - self.construct - last_OP;  
+  console.log("Construct_old== "+construct_Old);
+  console.log("KERNEL CORE: <ADDITION=>"+addition);
+  
+
 }
 
-//self.Num1_S = I_like_This_Robust_Parser(0,self.Num1);
-//self.Num2_S = I_like_This_Robust_Parser(0,self.Num2);
-//Sig_Total = Get_Smallest(self.Num1_S,self.Num2_S);
-//Sig_Value = Get_Largest(self.Num1_S,self.Num2_S);
+Sig_Total = Get_Smallest(0,self.buffer);
+console.log("SIGTOTAL "+Sig_Total);
+Sig_Value = Get_Largest(0,self.buffer);
 
 if (self.Verb=="*" && self.OnLoopFinish === true) {
   console.log("----------->FINAL SIG CALC = "+Sig_Total+"<---------------");
